@@ -93,19 +93,13 @@ module.exports = class escrow_books extends EventEmitter {
                     for (let index = 0; index < rows.length; index++) {
                         const element = rows[index]
                         const data = this.mutateData(book_offers, element.account)
-                        const asks_liquidity = self.liquidityCheckAsks(element.account, element.amount, currency, issuer, data, book_offers.ledger)
+                        // const asks_liquidity = self.liquidityCheckAsks(element.account, element.amount, currency, issuer, data, book_offers.ledger)
                         const bids_liquidity = self.liquidityCheckBids(element.account, element.amount, currency, issuer, data, book_offers.ledger)
-                        log(`liquidityCheckAsks`, asks_liquidity)
-                        log(`liquidityCheckBids`, bids_liquidity)
+                        // log(`liquidityCheckAsks`, asks_liquidity)
+                        // log(`liquidityCheckBids`, bids_liquidity)
                         
                         const liquidity_call = new decimal(1).div(bids_liquidity.last).mul(decimal.sum(element.amount, element.collateral)).toFixed() 
                         const liquidity_base = new decimal(element.rate).mul(element.amount).toFixed() 
-                        
-                        log('current rate', liquidity_call)
-                        log('loan rate', liquidity_base)
-
-                        log('rate loan', new decimal(1).div(element.rate).toFixed())
-                        log('rate now', new decimal(bids_liquidity.last).toFixed())
                         
 
                         const rate_update = {
