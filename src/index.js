@@ -81,7 +81,7 @@ class service  {
 									Pubsub.route({'PONG': json.message.account}, json.message.account)
 									break
 								case 'SUBSCRIBE': 
-									log('SUBSCRIBE', json.account)
+									log('SUBSCRIBE', json.message.account)
 									if ('account' in json.message) {
 										const res = Pubsub.channelPrivate(json.message.account)
 										Pubsub.subscribe(ws, json.message.account)
@@ -89,7 +89,7 @@ class service  {
 									break
 								case 'ESCROW': 
 									// add user channel
-									log('ESCROW', json.account)
+									log('ESCROW', json.message.account)
 									if ('account' in json.message) {
 										const res = Pubsub.channelPrivate(json.message.account)
 										Escrow.conditionFulfillment(json.message.account, json.message.destination, json.message.collateral, json.message.amount, json.message.currency, json.message.issuer, json.message.cancel_after)
