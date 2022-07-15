@@ -106,6 +106,7 @@ module.exports = class escrow extends EventEmitter {
                         //something is broken in this listener its not returning respon on wait. For the paths...
                         //this.subscriptionListener(subscription)
                     }
+                    log('subbbbbb', subscription)
                 } catch (error) {
 					log('error', error)
 				}
