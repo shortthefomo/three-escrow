@@ -14,7 +14,7 @@ module.exports = class escrow_books extends EventEmitter {
         super()
 
         dotenv.config()
-        const nodes = process.env.XRPL_BOOK_NODES.split(',')
+        const nodes = process.env.XRPL_MAINNET.split(',')
         const client = new XrplClient(nodes)
         
 		Object.assign(this, {

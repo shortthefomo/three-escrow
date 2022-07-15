@@ -22,7 +22,7 @@ module.exports = class escrow extends EventEmitter {
 
         dotenv.config()
         const Sdk = new XummSdk(process.env.XUMMAPPKEY, process.env.XUMMAPPSECRET)
-		let client = new XrplClient('wss://s.altnet.rippletest.net:51233')
+		let client = new XrplClient(process.env.XRPL_TESTNET)
         const escrow_books = new EscrowBooks(PubSubManager)
         const escrow_watch = new EscrowWatch(this, escrow_books, PubSubManager)
         
