@@ -221,6 +221,7 @@ module.exports = class escrow extends EventEmitter {
                         OfferSequence: offer_sequence,
                         Sequence: account_data.Sequence,
                         Fee: feeBase.toString(),
+                        Fulfillment: 'A0228020B3AC5BBE077D0621EE20511398BC0F77C1D69F1B81A6D719E252FD594577AEC9',
                         Memos: memos
                     }
     
