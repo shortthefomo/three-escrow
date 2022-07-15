@@ -62,7 +62,7 @@ module.exports = class escrow extends EventEmitter {
                             Amount: new decimal((amount * rate) * 1_000_000).toFixed(0),
                             Destination: destination,
                             CancelAfter: CancelAfter,
-                            // FinishAfter: this.ledgerEpoch() + 10000,
+                            FinishAfter: CancelAfter, //this.ledgerEpoch() + 10000,
                             Condition: escrow.condition,
                             Memos: memos,
                             DestinationTag: 1313,
