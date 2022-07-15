@@ -90,7 +90,7 @@ module.exports = class escrow_open {
 
             },
             cancelEscrow(sequence, account, escrow_condition) {
-                Escrow.cancelEscrow(element.sequence, element.account, element.escrow_condition)
+                Escrow.cancelEscrow(sequence, account, escrow_condition)
             },
             async findOpenLoans(account) {
                 const query =`SELECT currency, issuer, rate, amount, collateral, account, destination, cancel_after, escrow.escrow_condition FROM escrow 
