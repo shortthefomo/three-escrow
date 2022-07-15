@@ -1,0 +1,31 @@
+{
+  "name": "three-escrow",
+  "version": "0.0.1",
+  "description": "XRPL Escrow",
+  "main": "src/index.js",
+  "scripts": {
+    "dev": "DEBUG=escrow* nodemon src/index.js",
+    "prod": "DEBUG=escrow* node src/index.js"
+  },
+  "author": "Lathan Britz",
+  "license": "MIT",
+  "dependencies": {
+    "EventEmitter": "^1.0.0",
+    "app": "^0.1.0",
+    "crypto": "^1.0.1",
+    "debug": "^4.3.3",
+    "decimal.js": "^10.3.1",
+    "dotenv": "^12.0.3",
+    "five-bells-condition": "^5.0.1",
+    "fs": "^0.0.1-security",
+    "http": "^0.0.1-security",
+    "https": "^1.0.0",
+    "mysql2": "^2.3.3",
+    "node-cache": "^5.1.2",
+    "nodemon": "^2.0.15",
+    "ws": "^8.8.0",
+    "xrpl-accountlib": "^1.5.2",
+    "xrpl-client": "^1.9.5",
+    "xumm-sdk": "^1.3.4"
+  }
+}
