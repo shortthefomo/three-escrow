@@ -84,7 +84,7 @@ module.exports = class escrow_open {
                         if (!('account' in req.query)) { return res.json({ 'error' : 'missing parameter account'}) }
 
                         self.cancelEscrow(req.query.sequence, req.query.account, req.query.escrow_condition)
-                        log(`cancelEscrow: ${escrow_condition} ` + req.route.path)
+                        log(`cancelEscrow: ${req.query.escrow_condition} ` + req.route.path)
                     }
                 })
 
