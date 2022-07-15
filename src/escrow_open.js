@@ -8,7 +8,7 @@ const debug = require('debug')
 const log = debug('escrow:open')
 
 module.exports = class escrow_open {
-	constructor(nodeCache) {
+	constructor(nodeCache, Escrow) {
         
         dotenv.config()
 
@@ -73,6 +73,24 @@ module.exports = class escrow_open {
                     }
                 })
 
+                app.get('/api/v1/escrow/cancel', async function(req, res) {
+                    log('Called: ' + req.route.path)
+                    log(req.query)
+
+                    if (testing) {
+                        res.header("Access-Control-Allow-Origin", "*")
+                        if (!('escrow_condition' in req.query)) { return res.json({ 'error' : 'missing parameter escrow_condition'}) }
+                        if (!('sequence' in req.query)) { return res.json({ 'error' : 'missing parameter sequence'}) }
+                        if (!('account' in req.query)) { return res.json({ 'error' : 'missing parameter account'}) }
+
+                        this.cancelEscrow(req.query.sequence, req.query.account, req.query.escrow_condition)
+                        log(`cancelEscrow: ${escrow_condition} ` + req.route.path)
+                    }
+                })
+
+            },
+            cancelEscrow(sequence, account, escrow_condition) {
+                Escrow.cancelEscrow(element.sequence, element.account, element.escrow_condition)
             },
             async findOpenLoans(account) {
                 const query =`SELECT currency, issuer, rate, amount, collateral, account, destination, cancel_after, escrow.escrow_condition FROM escrow 

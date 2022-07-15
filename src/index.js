@@ -49,7 +49,7 @@ class service  {
 				this.createEndPoints()
 			},
 			createEndPoints() {
-				const open = new EscrowOpen(myCache)
+				const open = new EscrowOpen(myCache, Escrow)
 				open.createEndPoint(app, true)
 			},
             startSocketServer() {
