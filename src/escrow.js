@@ -52,9 +52,9 @@ module.exports = class escrow extends EventEmitter {
                     }]
                     const rippleOffset = 946684800
                     const offSet = 60 * 10 // 24*60*60 -> 24 hours
-                    // const FinishAfter = Math.floor(new Date(cancel_after).getTime() / 1000) + (offSet) - rippleOffset
-                    // const CancelAfter = Math.floor((new Date(cancel_after).getTime() + 10_000) / 1000) + (offSet) - rippleOffset
-                    const CancelAfter = Math.floor(new Date(cancel_after).getTime() / 1000) + (offSet) - rippleOffset
+                    const FinishAfter = Math.floor(new Date(cancel_after).getTime() / 1000) + (offSet) - rippleOffset
+                    const CancelAfter = Math.floor((new Date(cancel_after).getTime() + 10_000) / 1000) + (offSet) - rippleOffset
+                    // const CancelAfter = Math.floor(new Date(cancel_after).getTime() / 1000) + (offSet) - rippleOffset
                     const rate = await escrow_books.currentRate(amount, currency, issuer)
                     
                     const EscrowPayload = {
@@ -64,7 +64,7 @@ module.exports = class escrow extends EventEmitter {
                             Amount: new decimal((amount * rate) * 1_000_000).toFixed(0),
                             Destination: destination,
                             CancelAfter: CancelAfter,
-                            // FinishAfter: FinishAfter,
+                            FinishAfter: FinishAfter,
                             Condition: escrow.condition,
                             Memos: memos,
                             DestinationTag: 1313,
