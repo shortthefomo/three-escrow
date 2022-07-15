@@ -54,10 +54,7 @@ module.exports = class escrow extends EventEmitter {
                     const offSet = 60 * 10 // 24*60*60 -> 24 hours
                     const CancelAfter = Math.floor(new Date(cancel_after).getTime() / 1000) + (offSet) - rippleOffset
                     const rate = await escrow_books.currentRate(amount, currency, issuer)
-                    log('asdasdasdasdasdasdadasdadadadad fancy rate', rate)
-                    log('asdasdasdasdasdasdadasdadadadad fancy inv rate', 1/rate)
                     
-
                     const EscrowPayload = {
                         'txjson': {
                             Account: account,
