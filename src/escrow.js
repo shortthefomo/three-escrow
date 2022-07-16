@@ -59,7 +59,9 @@ module.exports = class escrow extends EventEmitter {
                 try {
                     const condition = await this.createEscrowFulfillment()
 
-                    const total = new decimal(escrow.amount).sum(escrow.collateral).toFixed(10)
+                    log('amout', escrow.amount)
+                    log('collateral', escrow.collateral)
+                    const total = decimal(escrow.amount).sum(new decimal(escrow.collateral)).toFixed(10)
 
                    
                     const rippleOffset = 946684800
