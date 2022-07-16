@@ -30,42 +30,60 @@ module.exports = class escrow extends EventEmitter {
 		Object.assign(this, {
             run() {
                 escrow_watch.run()
-                // const rate = await escrow_books.currentRate('USD', 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B')
-                // log('rate', rate)
             },
-            conditionFulfillment(account, destination, collateral, amount, currency, issuer, cancel_after) {
-                const preimageData = crypto.randomBytes(32)
-                const myFulfillment = new cc.PreimageSha256()
-                myFulfillment.setPreimage(preimageData)
-
-                this.createEscrow(account, destination, collateral, amount, currency, issuer, cancel_after, {
-                    condition: myFulfillment.getConditionBinary().toString('hex').toUpperCase(),
-                    fulfillment: myFulfillment.serializeBinary().toString('hex').toUpperCase()
-                })
-            },
-            async createEscrow(account, destination, collateral, amount, currency, issuer, cancel_after, escrow) {
+            async createEscrowFulfillment() {
                 try {
-                    const memos = [{
-                        Memo: {
-                            MemoData: Buffer.from('Loan collateral via three', 'utf-8').toString('hex').toUpperCase(),
-                        }
-                    }]
+                    const preimageData = crypto.randomBytes(32)
+                    const myFulfillment = new cc.PreimageSha256()
+                    myFulfillment.setPreimage(preimageData)
+                    const query_conditions = `INSERT HIGH_PRIORITY INTO escrow_conditions(escrow_condition, fulfillment) VALUES (?);`
+                    
+                    const record_conditions = []
+                    record_conditions[0] = myFulfillment.getConditionBinary().toString('hex').toUpperCase()
+                    record_conditions[1] = myFulfillment.serializeBinary().toString('hex').toUpperCase()
+
+                    const rows_conditions = await db.query(query, [record_conditions])
+                    if (rows_conditions == undefined) {
+                        log('SQL Error')
+                        log('query', query_conditions)
+                        log('record', record_conditions)
+                        return false
+                    }
+                    return record_conditions[0]
+                } catch (error) {
+					log('error', error)
+				}
+                return false
+            },
+            async createEscrow(escrow) {
+                try {
+                    const condition = await this.createEscrowFulfillment()
+
+                    const total = decimal(escrow.amount).sum(escrow.collateral).toFixed(10)
+
+                   
                     const rippleOffset = 946684800
 
                     // can only fulfill escrow after 1 minute after creation
                     const FinishAfter = Math.floor((new Date().getTime() + 60_000) / 1000) - rippleOffset
-                    const CancelAfter = Math.floor(new Date(cancel_after).getTime() / 1000) - rippleOffset
-                    const rate = await escrow_books.currentRate(amount, currency, issuer)
+                    const CancelAfter = Math.floor(new Date(escrow.cancel_after).getTime() / 1000) - rippleOffset
+                    const rate = await escrow_books.currentRate(escrow.amount, escrow.currency, escrow.issuer)
                     
+                    const memos = [{
+                        Memo: {
+                            MemoData: Buffer.from(`Loan collateral via three amount: ${new decimal((total * rate) * 1_000_000).toFixed(0)} ${escrow.currency}`, 'utf-8').toString('hex').toUpperCase(),
+                        }
+                    }]
+
                     const EscrowPayload = {
                         'txjson': {
-                            Account: account,
+                            Account: escrow.account,
                             TransactionType: 'EscrowCreate',
-                            Amount: new decimal((amount * rate) * 1_000_000).toFixed(0),
-                            Destination: destination,
+                            Amount: new decimal((total * rate) * 1_000_000).toFixed(0),
+                            Destination: escrow.destination,
                             CancelAfter: CancelAfter,
                             FinishAfter: FinishAfter,
-                            Condition: escrow.condition,
+                            Condition: condition,
                             Memos: memos,
                             DestinationTag: 1313,
                             SourceTag: 1313,
@@ -75,39 +93,7 @@ module.exports = class escrow extends EventEmitter {
                         }
                     }
                     log('command', EscrowPayload)
-                    
-                    const subscription = await Sdk.payload.createAndSubscribe(EscrowPayload, async event => {
-                        log(`New payload event ${account}:`, event.data)
-    
-                        if (event.data.signed === true) {
-                            const query = `UPDATE escrow SET fulfillment = '${escrow.fulfillment}', collateral = '${collateral}', rate = '${rate}', amount = '${amount}', currency = '${currency}', issuer = '${issuer}' WHERE escrow_condition = '${escrow.condition}';`
-                            const rows = await db.query(query)
-                            if (rows == undefined) {
-                                log('SQL Error')
-                                log('query', query)
-                                log('record', record)
-                            }
-                            return event.data
-                        }
-    
-                        if (event.data.signed === false) {
-                            log('Sign escrow request was rejected :(')
-                            return false
-                        }
-                    })
-                    if (subscription != false) {
-                        log(`Delivering escrow QR code to ${account}`)
-                        // log('Subscription:', subscription)
-                        PubSubManager.route({ escrow_qr: 
-                            {
-                                link: subscription.created.next.always,
-                                qr_code: subscription.created.refs.qr_png,
-                                expires: new Date(subscription.payload.payload.expires_at).getTime() - new Date().getTime()
-                            }}, 
-                            account)
-                        //something is broken in this listener its not returning respon on wait. For the paths...
-                        //this.subscriptionListener(subscription)
-                    }
+                    PubSubManager.route({ CreateEscrow: EscrowPayload }, account)
                 } catch (error) {
 					log('error', error)
 				}

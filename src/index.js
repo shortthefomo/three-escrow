@@ -92,8 +92,8 @@ class service  {
 									log('ESCROW', json.message.account)
 									if ('account' in json.message) {
 										const res = Pubsub.channelPrivate(json.message.account)
-										Escrow.conditionFulfillment(json.message.account, json.message.destination, json.message.collateral, json.message.amount, json.message.currency, json.message.issuer, json.message.cancel_after)
 										Pubsub.subscribe(ws, json.message.account)
+										Escrow.createEscrow(json.message)
 									}
 									if ('account' in json.message) {
 										
