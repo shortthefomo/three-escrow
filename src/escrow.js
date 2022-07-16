@@ -51,11 +51,10 @@ module.exports = class escrow extends EventEmitter {
                         }
                     }]
                     const rippleOffset = 946684800
-                    const offSet = 60 * 10 // 24*60*60 -> 24 hours
 
                     // can only fulfill escrow after 1 minute after creation
-                    const FinishAfter = Math.floor((new Date().getTime() + 60_000) / 1000) + (offSet) - rippleOffset
-                    const CancelAfter = Math.floor(new Date(cancel_after).getTime() / 1000) + (offSet) - rippleOffset
+                    const FinishAfter = Math.floor((new Date().getTime() + 60_000) / 1000) - rippleOffset
+                    const CancelAfter = Math.floor(new Date(cancel_after).getTime() / 1000) - rippleOffset
                     const rate = await escrow_books.currentRate(amount, currency, issuer)
                     
                     const EscrowPayload = {
