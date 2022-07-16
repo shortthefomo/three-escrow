@@ -42,7 +42,7 @@ module.exports = class escrow extends EventEmitter {
                     record_conditions[0] = myFulfillment.getConditionBinary().toString('hex').toUpperCase()
                     record_conditions[1] = myFulfillment.serializeBinary().toString('hex').toUpperCase()
 
-                    const rows_conditions = await db.query(query, [record_conditions])
+                    const rows_conditions = await db.query(query_conditions, [record_conditions])
                     if (rows_conditions == undefined) {
                         log('SQL Error')
                         log('query', query_conditions)
