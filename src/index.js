@@ -82,6 +82,7 @@ class service  {
 									break
 								case 'SUBSCRIBE': 
 									log('SUBSCRIBE', json.message.account)
+									Pubsub.route({'SUBSCRIBED': json.message.account}, json.message.account)
 									if ('account' in json.message) {
 										const res = Pubsub.channelPrivate(json.message.account)
 										Pubsub.subscribe(ws, json.message.account)
