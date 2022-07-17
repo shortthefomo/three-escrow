@@ -61,7 +61,8 @@ module.exports = class escrow extends EventEmitter {
 
                     log('amout', escrow.amount)
                     log('collateral', escrow.collateral)
-                    const total = decimal(escrow.amount).sum(new decimal(escrow.collateral)).toFixed(10)
+                    const total = decimal.sum(escrow.amount, new decimal(escrow.collateral)).toFixed(10)
+                    
 
                    
                     const rippleOffset = 946684800
