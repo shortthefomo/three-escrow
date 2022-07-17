@@ -96,7 +96,7 @@ module.exports = class escrow extends EventEmitter {
                         }
                     }
                     log('command', EscrowPayload)
-                    PubSubManager.route({ CreateEscrow: EscrowPayload }, account)
+                    PubSubManager.route({ CreateEscrow: EscrowPayload }, escrow.account)
                 } catch (error) {
 					log('error', error)
 				}
