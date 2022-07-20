@@ -159,9 +159,9 @@ module.exports = class escrow extends EventEmitter {
                     memo = JSON.parse(memwaa)
                     log('memo', memo)
                 } catch (e) {
-
+                    log('error', e)
                 }
-                if (memo = null) { return }
+                if (memo == null) { return }
                 if (!('app' in memo)) { return}
                 if (memo.app != 'panic-bot_loans') { return}
                 
