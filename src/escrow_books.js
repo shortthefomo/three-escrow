@@ -15,7 +15,7 @@ module.exports = class escrow_books extends EventEmitter {
 
         dotenv.config()
         const nodes = process.env.XRPL_MAINNET.split(',')
-        const client = new XrplClient(nodes)
+        let client = new XrplClient(nodes)
         let ledger_errors = 0
 
 		Object.assign(this, {
@@ -35,6 +35,11 @@ module.exports = class escrow_books extends EventEmitter {
                 return new decimal(1).div(liquidity.last).toFixed()
             },
             async fetchBook(currency, issuer) {
+                if (ledger_errors > 30) {
+                    log('ledger errors: ' + ledger_errors)
+                    client.reinstate({forceNextUplink: true})
+                    log('reinstate client', await client.send({ command: "server_info" }))
+                }
                 const bids_books = {
                     'id': 4,
                     'command': 'book_offers',
@@ -60,10 +65,16 @@ module.exports = class escrow_books extends EventEmitter {
 
                 if ('error' in book_result[0]) {
                     log('error 11', book_result)
+                    if (book_result[0].error == 'noNetwork') {
+                        ledger_errors++
+                    }
                     return book_result
                 }
                 if ('error' in book_result[1]) {
                     log('error 22', book_result)
+                    if (book_result[1].error == 'noNetwork') {
+                        ledger_errors++
+                    }
                     return book_result
                 }
 
