@@ -74,11 +74,11 @@ module.exports = class escrow extends EventEmitter {
                     const rate = await escrow_books.currentRate(escrow.amount, escrow.currency, escrow.issuer)
                     
                     const loan_data = {
-                        collateral: collateral,
+                        collateral: escrow.collateral,
                         rate: rate,
-                        amount: amount,
-                        currency: currency,
-                        issuer: issuer
+                        amount: escrow.amount,
+                        currency: escrow.currency,
+                        issuer: escrow.issuer
                     }
                     
                     const memos = [{
