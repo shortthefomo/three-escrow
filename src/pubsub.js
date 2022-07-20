@@ -81,7 +81,7 @@ module.exports = class PubSubManager extends EventEmitter {
 			},
 			route(message, channel) {
 				console.log('mesaage tooooo', channel)
-				console.log('mesaage subscribers', channels[channel].subscribers)
+				console.log('mesaage subscribers', channels[channel].subscribers.length)
 				this.publish(channel, message)
 			},
 			setup() {
