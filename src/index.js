@@ -77,7 +77,6 @@ class service  {
 										log('PING', json.message.account)
 										if (!Pubsub.checkChannel(json.message.account)) {
 											const res = Pubsub.channelPrivate(json.message.account)
-											console.log('sussss 2 subscribe')
 											Pubsub.subscribe(ws, json.message.account)
 										}
 										Pubsub.route({'PONG': json.message.account}, json.message.account)
@@ -89,17 +88,13 @@ class service  {
 										Pubsub.route({'SUBSCRIBED': json.message.account}, json.message.account)
 
 										const res = Pubsub.channelPrivate(json.message.account)
-										console.log('sussss 1 subscribe')
 										Pubsub.subscribe(ws, json.message.account)
 									}
 									break
 								case 'ESCROW': 
 									if ('account' in json.message) {
 										log('ESCROW', json.message.account)
-										const res = Pubsub.channelPrivate(json.message.account)
-										Pubsub.subscribe(ws, json.message.account)
 										Escrow.createEscrow(json.message)
-										
 									}
 									break
 							}

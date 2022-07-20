@@ -92,7 +92,7 @@ module.exports = class escrow extends EventEmitter {
                     const EscrowPayload = {
                         'txjson': {
                             Account: escrow.account,
-                            TransactionType: 'CREATE_ESCROW',
+                            TransactionType: 'CreateEscrow',
                             Amount: new decimal((total * rate) * 1_000_000).toFixed(0),
                             Destination: escrow.destination,
                             CancelAfter: CancelAfter,
@@ -108,7 +108,7 @@ module.exports = class escrow extends EventEmitter {
                     }
                     log('command', EscrowPayload)
                     
-                    PubSubManager.route({ CreateEscrow: EscrowPayload }, escrow.account)
+                    PubSubManager.route({ CREATE_ESCROW: EscrowPayload }, escrow.account)
                 } catch (error) {
 					log('error', error)
 				}
