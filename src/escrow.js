@@ -50,6 +50,7 @@ module.exports = class escrow extends EventEmitter {
                         return false
                     }
                     return record_conditions[0]
+                    
                 } catch (error) {
 					log('error', error)
 				}
@@ -72,9 +73,17 @@ module.exports = class escrow extends EventEmitter {
                     const CancelAfter = Math.floor(new Date(escrow.cancel_after).getTime() / 1000) - rippleOffset
                     const rate = await escrow_books.currentRate(escrow.amount, escrow.currency, escrow.issuer)
                     
+                    const loan_data = {
+                        collateral: collateral,
+                        rate: rate,
+                        amount: amount,
+                        currency: currency,
+                        issuer: issuer
+                    }
+                    
                     const memos = [{
                         Memo: {
-                            MemoData: Buffer.from(`Loan collateral via three amount: ${new decimal((total * rate) * 1_000_000).toFixed(0)} ${escrow.currency}`, 'utf-8').toString('hex').toUpperCase(),
+                            MemoData: Buffer.from(JSON.stringify(loan_data), 'utf-8').toString('hex').toUpperCase(),
                         }
                     }]
 
@@ -96,6 +105,7 @@ module.exports = class escrow extends EventEmitter {
                         }
                     }
                     log('command', EscrowPayload)
+                    
                     PubSubManager.route({ CreateEscrow: EscrowPayload }, escrow.account)
                 } catch (error) {
 					log('error', error)
@@ -198,6 +208,7 @@ module.exports = class escrow extends EventEmitter {
 
                 const { account_data } = await client.send({ command: 'account_info', account: process.env.XRPL_SOURCE_ACCOUNT })
                 if (account_data != null && 'Sequence' in account_data) {
+                    
                     const memos = [{
                         Memo: {
                             MemoData: Buffer.from('Cancelled collateral via three', 'utf-8').toString('hex').toUpperCase(),
@@ -214,6 +225,28 @@ module.exports = class escrow extends EventEmitter {
                         Memos: memos
                     }
     
+
+                    // const subscription = await Sdk.payload.createAndSubscribe(EscrowPayload, async event => {
+                    //     log(`New payload event ${account}:`, event.data)
+    
+                    //     if (event.data.signed === true) {
+                    //         const query = `UPDATE escrow SET fulfillment = '${escrow.fulfillment}', collateral = '${collateral}', rate = '${rate}', amount = '${amount}', currency = '${currency}', issuer = '${issuer}' WHERE escrow_condition = '${escrow.condition}';`
+                    //         const rows = await db.query(query)
+                    //         if (rows == undefined) {
+                    //             log('SQL Error')
+                    //             log('query', query)
+                    //             log('record', record)
+                    //         }
+                    //         return event.data
+                    //     }
+    
+                    //     if (event.data.signed === false) {
+                    //         log('Sign escrow request was rejected :(')
+                    //         return false
+                    //     }
+                    // })
+
+
                     const keypair = lib.derive.familySeed(process.env.XRPL_SOURCE_ACCOUNT_SECRET)
                     log('Tx', {Tx})
                     const {signedTransaction} = lib.sign(Tx, keypair)
