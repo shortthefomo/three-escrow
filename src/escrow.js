@@ -150,11 +150,12 @@ module.exports = class escrow extends EventEmitter {
                 log('ledger', ledger)
                 if (!('Memos' in transaction)) { return}
                 if (!('Memo' in transaction.Memos[0])) { return}
+                if (!('MemoData' in transaction.Memos[0].Memo)) { return}
                 let memwaa = null
                 let memo = null
                 try {
-                    log('raw', transaction.Memos[0].Memo)
-                    memwaa = Buffer.from(transaction.Memos[0].Memo, 'hex').toString('utf8').split(':')
+                    log('raw', transaction.Memos[0].Memo.MemoData)
+                    memwaa = Buffer.from(transaction.Memos[0].Memo.MemoData, 'hex').toString('utf8').split(':')
                     log('memwaa', memwaa)
                     memo = JSON.parse(memwaa)
                     log('memo', memo)
