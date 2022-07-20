@@ -299,7 +299,9 @@ module.exports = class escrow extends EventEmitter {
                 let query =`SELECT * FROM escrow_completed WHERE owner = '${data.account}' AND escrow_condition = '${data.escrow_condition}' AND attempts <= 5;`
                 const completed = await db.query(query)
 
-                query = `SELECT * FROM escrow WHERE escrow_condition = '${data.escrow_condition}';`
+                query = `SELECT * FROM escrow_conditions 
+                    JOIN escrow ON (escrow.escrow_condition = escrow_conditions.escrow_condition)
+                    WHERE escrow.escrow_condition '${data.escrow_condition}';`
                 
                 const escrow = await db.query(query)
                 log('finishEscrow lookup ', completed)
