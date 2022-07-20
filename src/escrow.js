@@ -79,7 +79,7 @@ module.exports = class escrow extends EventEmitter {
                         amount: escrow.amount,
                         currency: escrow.currency,
                         issuer: escrow.issuer,
-                        app: 'panic-bot',
+                        app: 'panic-bot_loans',
                         version: '0.0.1'
                     }
                     
@@ -151,20 +151,28 @@ module.exports = class escrow extends EventEmitter {
                 if (!('Memos' in transaction)) { return}
                 if (!('Memo' in transaction.Memos[0])) { return}
                 log('mem waaa', transaction.Memos[0].Memo)
+                let memwaa = ''
+                try {
+                    memwaa = Buffer.from(transaction.Memos[0].Memo, 'hex').toString('utf8').split(':')
+                } catch (e) {
 
+                }
+                if (!('app' in memwaa)) { return}
+                if (memwaa.app != 'panic-bot_loans') { return}
+                
                 const record = []
                 record[0] = transaction.Condition
                 record[1] = transaction.hash
                 record[2] = transaction.Account
                 record[3] = transaction.Destination
-                record[4] = null
-                record[5] = 0
-                record[6] = 0
-                record[7] = 0
+                record[4] = memwaa.currency
+                record[5] = memwaa.amount
+                record[6] = memwaa.rate
+                record[7] = memwaa.collateral
                 record[8] = (transaction?.DestinationTag != undefined) ? transaction.DestinationTag : null
                 record[9] = (transaction?.SourceTag != undefined) ? transaction.SourceTag : null
                 record[10] = ledger
-                record[11] = null
+                record[11] = memwaa.issuer
                 record[12] = new Date().toISOString().slice(0, 19).replace('T', ' ')
                 record[13] = null
                 record[14] = (transaction?.CancelAfter != undefined) ? transaction.CancelAfter : null
