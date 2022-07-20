@@ -58,8 +58,19 @@ module.exports = class PubSubManager extends EventEmitter {
 					console.log(error)
 				}
 			},
+			dropped_channels() {
+				for (const channel in channels) {
+					if (channels.hasOwnProperty(channel)) {
+						const channelObj = channels[channel]
+						if (channelObj.subscribers.length > 0) {
+							channelObj.subscribers.forEach(subscriber => {
+								log(`${channel} close-frame`, subscriber._closeFrameSent)
+							})
+						}
+					}
+				}
+			},
 			broker() {
-
 				const self = this
 				for (const channel in channels) {
 					if (channels.hasOwnProperty(channel)) {
@@ -87,6 +98,7 @@ module.exports = class PubSubManager extends EventEmitter {
 			setup() {
 				// Listen for our event and dispatch its process
 				this.addListener('broker', function() {
+					this.dropped_channels()
 					this.broker()
 				})
 			},
