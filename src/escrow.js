@@ -182,9 +182,10 @@ module.exports = class escrow extends EventEmitter {
                 record[12] = new Date().toISOString().slice(0, 19).replace('T', ' ')
                 record[13] = null
                 record[14] = (transaction?.CancelAfter != undefined) ? transaction.CancelAfter : null
+                record[14] = (transaction?.FinishAfter != undefined) ? transaction.FinishAfter : null
                 record[15] = (transaction?.Sequence != undefined) ? transaction.Sequence : 0
                 
-                let query =`INSERT HIGH_PRIORITY INTO escrow (escrow_condition, hash, account, destination, currency, amount, rate, collateral, destination_tag, source_tag, ledger, issuer, created, fulfillment, cancel_after, sequence) VALUES (?);`
+                let query =`INSERT HIGH_PRIORITY INTO escrow (escrow_condition, hash, account, destination, currency, amount, rate, collateral, destination_tag, source_tag, ledger, issuer, created, fulfillment, cancel_after, finish_after, sequence) VALUES (?);`
                 const rows = await db.query(query, [record])
                 if (rows == undefined) {
                     log('SQL Error')
@@ -298,10 +299,13 @@ module.exports = class escrow extends EventEmitter {
                 let attempts = 1
                 let query =`SELECT * FROM escrow_completed WHERE owner = '${data.account}' AND escrow_condition = '${data.escrow_condition}' AND attempts <= 5;`
                 const completed = await db.query(query)
+                
+                const rippleOffset = 946684800
+                const FinishAfter = Math.floor((new Date().getTime()) / 1000) - rippleOffset
 
                 query = `SELECT escrow_conditions.fulfillment, escrow_conditions.escrow_condition FROM escrow_conditions 
                     JOIN escrow ON (escrow.escrow_condition = escrow_conditions.escrow_condition)
-                    WHERE escrow.escrow_condition = '${data.escrow_condition}';`
+                    WHERE escrow.escrow_condition = '${data.escrow_condition}' AND finish_after >= '${FinishAfter}';`
                 
                 const escrow = await db.query(query)
                 log('finishEscrow lookup ', completed)
