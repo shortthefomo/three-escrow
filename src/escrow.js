@@ -348,7 +348,7 @@ module.exports = class escrow extends EventEmitter {
                             MemoData: Buffer.from(`Finish escrow via three, order books slip to ${data.current_rate} exceeding liquidation rate ${data.original_rate} on ledger ${data.ledger}`, 'utf-8').toString('hex').toUpperCase(),
                         }
                     }]
-                    
+                    log('escrowvvvvvv', escrow)
                     const Tx = {
                         Account: process.env.XRPL_SOURCE_ACCOUNT,
                         TransactionType: 'EscrowFinish',
