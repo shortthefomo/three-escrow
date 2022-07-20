@@ -78,7 +78,9 @@ module.exports = class escrow extends EventEmitter {
                         rate: rate,
                         amount: escrow.amount,
                         currency: escrow.currency,
-                        issuer: escrow.issuer
+                        issuer: escrow.issuer,
+                        app: 'panic-bot',
+                        version: '0.0.1'
                     }
                     
                     const memos = [{
