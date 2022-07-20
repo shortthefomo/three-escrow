@@ -16,7 +16,8 @@ module.exports = class escrow_books extends EventEmitter {
         dotenv.config()
         const nodes = process.env.XRPL_MAINNET.split(',')
         const client = new XrplClient(nodes)
-        
+        let ledger_errors = 0
+
 		Object.assign(this, {
             run() {
                 this.listenOffers()
@@ -25,8 +26,17 @@ module.exports = class escrow_books extends EventEmitter {
             pollingBookOffers() {
                 this.emit('fetch_books')
             },
+            watchLedgerNetworkErrors(data) {
+                if ('error' in data[0]) {
+                    log('ledger error: ' + data[0].error)
+                }
+                if ('error' in data[1]) {
+                    log('ledger error: ' + data[1].error)
+                }
+            },
             async currentRate(amount, currency, issuer) {
                 const book_offers = await this.fetchBook(currency, issuer)
+                this.watchLedgerNetworkErrors(book_offers)
                 if (book_offers.asks == undefined || book_offers.bids == undefined) { return }
                 const data = this.mutateData(book_offers, process.env.XRPL_SOURCE_ACCOUNT)
                 const liquidity = this.liquidityCheckAsks(process.env.XRPL_SOURCE_ACCOUNT, amount, currency, issuer, data, book_offers.ledger, false)
