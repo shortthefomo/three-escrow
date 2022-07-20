@@ -39,6 +39,7 @@ module.exports = class escrow_books extends EventEmitter {
                     log('ledger errors: ' + ledger_errors)
                     client.reinstate({forceNextUplink: true})
                     log('reinstate client', await client.send({ command: "server_info" }))
+                    ledger_errors = 0
                 }
                 const bids_books = {
                     'id': 4,
