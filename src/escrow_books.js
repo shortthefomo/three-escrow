@@ -26,17 +26,8 @@ module.exports = class escrow_books extends EventEmitter {
             pollingBookOffers() {
                 this.emit('fetch_books')
             },
-            watchLedgerNetworkErrors(data) {
-                if ('error' in data[0]) {
-                    log('ledger error: ' + data[0].error)
-                }
-                if ('error' in data[1]) {
-                    log('ledger error: ' + data[1].error)
-                }
-            },
             async currentRate(amount, currency, issuer) {
                 const book_offers = await this.fetchBook(currency, issuer)
-                this.watchLedgerNetworkErrors(book_offers)
                 if (book_offers.asks == undefined || book_offers.bids == undefined) { return }
                 const data = this.mutateData(book_offers, process.env.XRPL_SOURCE_ACCOUNT)
                 const liquidity = this.liquidityCheckAsks(process.env.XRPL_SOURCE_ACCOUNT, amount, currency, issuer, data, book_offers.ledger, false)
@@ -68,11 +59,11 @@ module.exports = class escrow_books extends EventEmitter {
                 ])
 
                 if ('error' in book_result[0]) {
-                    log('error', book_result)
+                    log('error 11', book_result)
                     return book_result
                 }
                 if ('error' in book_result[1]) {
-                    log('error', book_result)
+                    log('error 22', book_result)
                     return book_result
                 }
 
