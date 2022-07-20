@@ -301,7 +301,7 @@ module.exports = class escrow extends EventEmitter {
 
                 query = `SELECT * FROM escrow_conditions 
                     JOIN escrow ON (escrow.escrow_condition = escrow_conditions.escrow_condition)
-                    WHERE escrow.escrow_condition '${data.escrow_condition}';`
+                    WHERE escrow.escrow_condition = '${data.escrow_condition}';`
                 
                 const escrow = await db.query(query)
                 log('finishEscrow lookup ', completed)
