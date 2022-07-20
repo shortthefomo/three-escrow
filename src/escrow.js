@@ -146,6 +146,9 @@ module.exports = class escrow extends EventEmitter {
                 if (ledger == undefined || transaction == undefined) { return }
                 log('insertEscrowData', transaction)
                 log('ledger', ledger)
+                if (!('Memos' in transaction)) { return}
+                if (!('Memo' in transaction.Memos[0])) { return}
+                log('mem waaa', transaction.Memos[0].Memo)
 
                 const record = []
                 record[0] = transaction.Condition
