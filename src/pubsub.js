@@ -63,7 +63,7 @@ module.exports = class PubSubManager extends EventEmitter {
 					if (channels.hasOwnProperty(channel)) {
 						const channelObj = channels[channel]
 						if (channelObj.subscribers.length > 0) {
-							channelObj.subscribers.forEach(subscriber, index => {
+							channelObj.subscribers.forEach((subscriber, index) => {
 								// log(`${index} ${channel} close-frame`, subscriber._closeFrameSent)
 								if (subscriber._closeFrameSent == true) {
 									delete channels[channel].subscribers[index]
