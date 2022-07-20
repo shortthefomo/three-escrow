@@ -197,7 +197,12 @@ module.exports = class escrow extends EventEmitter {
                 if (offer_sequence == null) { return 'noSequence'}
                 let attempts = 1
                 let feeBase = 10
-                let query =`SELECT * FROM escrow_completed WHERE owner = '${owner}' AND sequence = '${offer_sequence}' AND attempts <= 5;`
+                const rippleOffset = 946684800
+                const CancelAfter = Math.floor((new Date().getTime()) / 1000) - rippleOffset
+
+                let query =`SELECT * FROM escrow_completed 
+                    JOIN escrow ON (escrow.escrow_condition = escrow_completed.escrow_condition)
+                    WHERE owner = '${owner}' AND sequence = '${offer_sequence}' AND attempts <= 5 AND cancel_after >= '${CancelAfter}';`
                 const completed = await db.query(query)
 
                 if (completed != undefined && completed.length > 0) {    
@@ -215,7 +220,7 @@ module.exports = class escrow extends EventEmitter {
 
                     // up the fee if it failed
                     if (completed[0]?.engine_result == 'telINSUF_FEE_P') {
-                        feeBase += 10
+                        feeBase += (10 * attempts)
                     }
 
                     if (completed[0]?.attempts) {
@@ -243,27 +248,6 @@ module.exports = class escrow extends EventEmitter {
                         Fee: feeBase.toString(),
                         Memos: memos
                     }
-    
-
-                    // const subscription = await Sdk.payload.createAndSubscribe(EscrowPayload, async event => {
-                    //     log(`New payload event ${account}:`, event.data)
-    
-                    //     if (event.data.signed === true) {
-                    //         const query = `UPDATE escrow SET fulfillment = '${escrow.fulfillment}', collateral = '${collateral}', rate = '${rate}', amount = '${amount}', currency = '${currency}', issuer = '${issuer}' WHERE escrow_condition = '${escrow.condition}';`
-                    //         const rows = await db.query(query)
-                    //         if (rows == undefined) {
-                    //             log('SQL Error')
-                    //             log('query', query)
-                    //             log('record', record)
-                    //         }
-                    //         return event.data
-                    //     }
-    
-                    //     if (event.data.signed === false) {
-                    //         log('Sign escrow request was rejected :(')
-                    //         return false
-                    //     }
-                    // })
 
 
                     const keypair = lib.derive.familySeed(process.env.XRPL_SOURCE_ACCOUNT_SECRET)
@@ -293,7 +277,6 @@ module.exports = class escrow extends EventEmitter {
                 }
             },
             async finishEscrow(data) {
-                log('zzzzzz', data)
                 let feeBase = 350
                 let attempts = 1
                 let query =`SELECT * FROM escrow_completed WHERE owner = '${data.account}' AND escrow_condition = '${data.escrow_condition}' AND attempts <= 5;`
@@ -336,7 +319,7 @@ module.exports = class escrow extends EventEmitter {
 
                     // up the fee if it failed
                     if (completed[0]?.engine_result == 'telINSUF_FEE_P') {
-                        feeBase += 10
+                        feeBase += (10 * attempts)
                     }
 
                     if (completed[0]?.attempts) {
