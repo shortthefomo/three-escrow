@@ -150,29 +150,33 @@ module.exports = class escrow extends EventEmitter {
                 log('ledger', ledger)
                 if (!('Memos' in transaction)) { return}
                 if (!('Memo' in transaction.Memos[0])) { return}
-                log('mem waaa', transaction.Memos[0].Memo)
-                let memwaa = ''
+                let memwaa = null
+                let memo = null
                 try {
                     memwaa = Buffer.from(transaction.Memos[0].Memo, 'hex').toString('utf8').split(':')
+                    log('memwaa', memwaa)
+                    memo = JSON.parse(memwaa)
+                    log('memo', memo)
                 } catch (e) {
 
                 }
-                if (!('app' in memwaa)) { return}
-                if (memwaa.app != 'panic-bot_loans') { return}
+                if (memo = null) { return }
+                if (!('app' in memo)) { return}
+                if (memo.app != 'panic-bot_loans') { return}
                 
                 const record = []
                 record[0] = transaction.Condition
                 record[1] = transaction.hash
                 record[2] = transaction.Account
                 record[3] = transaction.Destination
-                record[4] = memwaa.currency
-                record[5] = memwaa.amount
-                record[6] = memwaa.rate
-                record[7] = memwaa.collateral
+                record[4] = memo.currency
+                record[5] = memo.amount
+                record[6] = memo.rate
+                record[7] = memo.collateral
                 record[8] = (transaction?.DestinationTag != undefined) ? transaction.DestinationTag : null
                 record[9] = (transaction?.SourceTag != undefined) ? transaction.SourceTag : null
                 record[10] = ledger
-                record[11] = memwaa.issuer
+                record[11] = memo.issuer
                 record[12] = new Date().toISOString().slice(0, 19).replace('T', ' ')
                 record[13] = null
                 record[14] = (transaction?.CancelAfter != undefined) ? transaction.CancelAfter : null
