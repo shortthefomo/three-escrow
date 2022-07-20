@@ -96,9 +96,6 @@ class service  {
 										Pubsub.subscribe(ws, json.message.account)
 										Escrow.createEscrow(json.message)
 									}
-									if ('account' in json.message) {
-										
-									}
 									break
 							}
 						} catch (error) {
