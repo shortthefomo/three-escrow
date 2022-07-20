@@ -35,7 +35,7 @@ module.exports = class escrow_books extends EventEmitter {
                 return new decimal(1).div(liquidity.last).toFixed()
             },
             async fetchBook(currency, issuer) {
-                if (ledger_errors > 30) {
+                if (ledger_errors > 10) {
                     log('ledger errors: ' + ledger_errors)
                     client.reinstate({forceNextUplink: true})
                     log('reinstate client', await client.send({ command: "server_info" }))
