@@ -65,14 +65,14 @@ module.exports = class escrow_books extends EventEmitter {
                 ])
 
                 if ('error' in book_result[0]) {
-                    log('error 11', book_result)
+                    log(`error ${ledger_errors}`, book_result)
                     if (book_result[0].error == 'noNetwork') {
                         ledger_errors++
                     }
                     return book_result
                 }
                 if ('error' in book_result[1]) {
-                    log('error 22', book_result)
+                    log(`error ${ledger_errors}`, book_result)
                     if (book_result[1].error == 'noNetwork') {
                         ledger_errors++
                     }
