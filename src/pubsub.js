@@ -66,7 +66,7 @@ module.exports = class PubSubManager extends EventEmitter {
 							channelObj.subscribers.forEach((subscriber, index) => {
 								// log(`${index} ${channel} close-frame`, subscriber._closeFrameSent)
 								if (subscriber._closeFrameSent == true) {
-									delete channels[channel].subscribers[index]
+									channels[channel].subscribers.splice(index, 1)
 								}
 							})
 						}
@@ -95,7 +95,7 @@ module.exports = class PubSubManager extends EventEmitter {
 			},
 			route(message, channel) {
 				console.log('mesaage tooooo', channel)
-				console.log('mesaage subscribers', channels[channel].subscribers)
+				console.log('mesaage subscribers', channels[channel].subscribers.length)
 				this.publish(channel, message)
 			},
 			setup() {
