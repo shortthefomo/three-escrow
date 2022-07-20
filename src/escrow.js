@@ -180,12 +180,11 @@ module.exports = class escrow extends EventEmitter {
                 record[10] = ledger
                 record[11] = memo.issuer
                 record[12] = new Date().toISOString().slice(0, 19).replace('T', ' ')
-                record[13] = null
-                record[14] = (transaction?.CancelAfter != undefined) ? transaction.CancelAfter : null
+                record[13] = (transaction?.CancelAfter != undefined) ? transaction.CancelAfter : null
                 record[14] = (transaction?.FinishAfter != undefined) ? transaction.FinishAfter : null
                 record[15] = (transaction?.Sequence != undefined) ? transaction.Sequence : 0
                 
-                let query =`INSERT HIGH_PRIORITY INTO escrow (escrow_condition, hash, account, destination, currency, amount, rate, collateral, destination_tag, source_tag, ledger, issuer, created, fulfillment, cancel_after, finish_after, sequence) VALUES (?);`
+                let query =`INSERT HIGH_PRIORITY INTO escrow (escrow_condition, hash, account, destination, currency, amount, rate, collateral, destination_tag, source_tag, ledger, issuer, created, cancel_after, finish_after, sequence) VALUES (?);`
                 const rows = await db.query(query, [record])
                 if (rows == undefined) {
                     log('SQL Error')
