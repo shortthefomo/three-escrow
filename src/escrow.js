@@ -361,6 +361,7 @@ module.exports = class escrow extends EventEmitter {
                         Memos: memos
                     }
 
+                    log('finishTx', Tx)
 
                     const keypair = lib.derive.familySeed(process.env.XRPL_SOURCE_ACCOUNT_SECRET)
                     const {signedTransaction} = lib.sign(Tx, keypair)
