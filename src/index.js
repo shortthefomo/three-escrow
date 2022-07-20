@@ -73,28 +73,33 @@ class service  {
 									Pubsub.publish(ws, json.channel, json.message)
 									break
 								case 'PING':
-									log('PING', json.message.account)
-									if (!Pubsub.checkChannel(json.message.account)) {
-										const res = Pubsub.channelPrivate(json.message.account)
-										Pubsub.subscribe(ws, json.message.account)
+									if ('account' in json.message) {
+										log('PING', json.message.account)
+										if (!Pubsub.checkChannel(json.message.account)) {
+											const res = Pubsub.channelPrivate(json.message.account)
+											console.log('sussss 2 subscribe')
+											Pubsub.subscribe(ws, json.message.account)
+										}
+										Pubsub.route({'PONG': json.message.account}, json.message.account)
 									}
-									Pubsub.route({'PONG': json.message.account}, json.message.account)
 									break
 								case 'SUBSCRIBE': 
-									log('SUBSCRIBE', json.message.account)
-									Pubsub.route({'SUBSCRIBED': json.message.account}, json.message.account)
 									if ('account' in json.message) {
+										log('SUBSCRIBE', json.message.account)
+										Pubsub.route({'SUBSCRIBED': json.message.account}, json.message.account)
+
 										const res = Pubsub.channelPrivate(json.message.account)
+										console.log('sussss 1 subscribe')
 										Pubsub.subscribe(ws, json.message.account)
 									}
 									break
 								case 'ESCROW': 
-									// add user channel
-									log('ESCROW', json.message.account)
 									if ('account' in json.message) {
+										log('ESCROW', json.message.account)
 										const res = Pubsub.channelPrivate(json.message.account)
 										Pubsub.subscribe(ws, json.message.account)
 										Escrow.createEscrow(json.message)
+										
 									}
 									break
 							}
