@@ -308,6 +308,7 @@ module.exports = class escrow extends EventEmitter {
 
                 if (escrow == undefined || escrow.length == 0) {
                     log('error', 'Escrow not found')
+                    log('query', query)
                     return 'escrowNotFound'
                 }
 
