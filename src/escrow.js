@@ -92,7 +92,7 @@ module.exports = class escrow extends EventEmitter {
                     const EscrowPayload = {
                         'txjson': {
                             Account: escrow.account,
-                            TransactionType: 'EscrowCreate',
+                            TransactionType: 'CREATE_ESCROW',
                             Amount: new decimal((total * rate) * 1_000_000).toFixed(0),
                             Destination: escrow.destination,
                             CancelAfter: CancelAfter,
