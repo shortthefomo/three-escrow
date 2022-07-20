@@ -80,6 +80,7 @@ module.exports = class PubSubManager extends EventEmitter {
 				}
 			},
 			route(message, channel) {
+				console.log('mesaage tooooo', channel)
 				this.publish(channel, message)
 			},
 			setup() {
