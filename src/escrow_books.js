@@ -91,19 +91,13 @@ module.exports = class escrow_books extends EventEmitter {
                 const worker = async (currency, issuer) => {
                     const rippleOffset = 946684800
                     const FinishAfter = Math.floor((new Date().getTime()) / 1000) - rippleOffset
-                    
+
                     const query =`SELECT escrow.sequence, escrow.escrow_condition, escrow.account, escrow.amount, escrow.rate, cancel_after, escrow.collateral, escrow.finish_after FROM escrow 
                         LEFT JOIN escrow_completed ON (escrow.escrow_condition = escrow_completed.escrow_condition)
                         WHERE ((escrow_completed.engine_result != 'tesSUCCESS' AND escrow_completed.engine_result != 'tecNO_TARGET') OR escrow_completed.engine_result IS NULL)
                         AND currency = '${currency}' 
                         AND issuer = '${issuer}'
                         AND finish_after >= '${FinishAfter}';`
-
-                        
-
-                    query = `SELECT escrow_conditions.fulfillment, escrow_conditions.escrow_condition FROM escrow_conditions 
-                        JOIN escrow ON (escrow.escrow_condition = escrow_conditions.escrow_condition)
-                        WHERE escrow.escrow_condition = '${data.escrow_condition}' AND finish_after >= '${FinishAfter}';`
 
                     const rows = await db.query(query)
                 
