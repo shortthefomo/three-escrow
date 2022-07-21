@@ -55,22 +55,25 @@ module.exports = class escrow_watch extends EventEmitter {
                 
                 this.startFindAndCancel()
             },
-            async findAndFinishConditionalEscrows() {
-                const query =`SELECT escrow.sequence, escrow.escrow_condition, escrow.account FROM escrow 
-                    LEFT JOIN escrow_completed ON (escrow.escrow_condition = escrow_completed.escrow_condition)
-                    WHERE ((escrow_completed.engine_result != 'tesSUCCESS' AND escrow_completed.engine_result != 'tecNO_TARGET') OR escrow_completed.engine_result IS NULL);`
-                const rows = await db.query(query)
+            // async findAndFinishConditionalEscrows() {
+            //     const rippleOffset = 946684800
+            //     const FinishAfter = Math.floor((new Date().getTime()) / 1000) - rippleOffset
+
+            //     const query =`SELECT escrow.sequence, escrow.escrow_condition, escrow.account FROM escrow 
+            //         LEFT JOIN escrow_completed ON (escrow.escrow_condition = escrow_completed.escrow_condition)
+            //         WHERE escrow.finish_after <= ${FinishAfter} AND ((escrow_completed.engine_result != 'tesSUCCESS' AND escrow_completed.engine_result != 'tecNO_TARGET') OR escrow_completed.engine_result IS NULL);`
+            //     const rows = await db.query(query)
 
                 
-                if (rows == undefined || rows.length == 0) {
-                    return 
-                }
-                log('findAndFinishConditionalEscrows', rows.length)
-                for (let index = 0; index < rows.length; index++) {
-                    const element = rows[index]
-                    Escrow.cancelEscrow(element.sequence, element.account, element.escrow_condition)
-                }
-            },
+            //     if (rows == undefined || rows.length == 0) {
+            //         return 
+            //     }
+            //     log('findAndFinishConditionalEscrows', rows.length)
+            //     for (let index = 0; index < rows.length; index++) {
+            //         const element = rows[index]
+            //         Escrow.cancelEscrow(element.sequence, element.account, element.escrow_condition)
+            //     }
+            // },
             listenFinishEscrows() {
                 EscrowBooks.on('finishEscrow', (data) => {
                     Escrow.finishEscrow(data)
