@@ -59,12 +59,12 @@ module.exports = class PubSubManager extends EventEmitter {
 				}
 			},
 			dropped_channels() {
+				// when clients fall off remove them from the subscriber list
 				for (const channel in channels) {
 					if (channels.hasOwnProperty(channel)) {
 						const channelObj = channels[channel]
 						if (channelObj.subscribers.length > 0) {
 							channelObj.subscribers.forEach((subscriber, index) => {
-								// log(`${index} ${channel} close-frame`, subscriber._closeFrameSent)
 								if (subscriber._closeFrameSent == true) {
 									channels[channel].subscribers.splice(index, 1)
 								}
@@ -79,7 +79,7 @@ module.exports = class PubSubManager extends EventEmitter {
 					if (channels.hasOwnProperty(channel)) {
 						const channelObj = channels[channel]
 
-						if (channels[channel].subscribers.length > 0) {
+						if (channelObj.subscribers.length > 0) {
 							if (channelObj.message) {
 								channelObj.subscribers.forEach(subscriber => {
 									for (var i = 0; i < channelObj.message.length; i++) {
@@ -94,8 +94,6 @@ module.exports = class PubSubManager extends EventEmitter {
 				}
 			},
 			route(message, channel) {
-				console.log('mesaage tooooo', channel)
-				console.log('mesaage subscribers', channels[channel].subscribers.length)
 				this.publish(channel, message)
 			},
 			setup() {
