@@ -53,6 +53,8 @@ module.exports = class escrow_books extends EventEmitter {
                     .padEnd(40, '0')
             },
             async fetchBook(currency, issuer) {
+                const hex_currency = this.currencyUTF8ToHex(currency)
+
                 if (ledger_errors > 10) {
                     log('ledger errors: ' + ledger_errors)
                     client.reinstate({forceNextUplink: true})
@@ -63,7 +65,7 @@ module.exports = class escrow_books extends EventEmitter {
                     'id': 4,
                     'command': 'book_offers',
                     'taker': process.env.XRPL_SOURCE_ACCOUNT,
-                    'taker_gets': {'currency': currency, 'issuer': issuer },
+                    'taker_gets': {'currency': hex_currency, 'issuer': issuer },
                     'taker_pays': {'currency': 'XRP' },
                     'limit': 100
                 }
@@ -73,7 +75,7 @@ module.exports = class escrow_books extends EventEmitter {
                     'command': 'book_offers',
                     'taker': process.env.XRPL_SOURCE_ACCOUNT,
                     'taker_gets': {'currency': 'XRP' },
-                    'taker_pays': {'currency': currency, 'issuer': issuer },
+                    'taker_pays': {'currency': hex_currency, 'issuer': issuer },
                     'limit': 100
                 }
 
