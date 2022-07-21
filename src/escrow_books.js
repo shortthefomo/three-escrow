@@ -27,12 +27,30 @@ module.exports = class escrow_books extends EventEmitter {
                 this.emit('fetch_books')
             },
             async currentRate(amount, currency, issuer) {
-                const book_offers = await this.fetchBook(currency, issuer)
+                const hex_currency = currencyUTF8ToHex(currency)
+                const book_offers = await this.fetchBook(hex_currency, issuer)
                 if (book_offers.asks == undefined || book_offers.bids == undefined) { return }
                 const data = this.mutateData(book_offers, process.env.XRPL_SOURCE_ACCOUNT)
-                const liquidity = this.liquidityCheckAsks(process.env.XRPL_SOURCE_ACCOUNT, amount, currency, issuer, data, book_offers.ledger, false)
+                const liquidity = this.liquidityCheckAsks(process.env.XRPL_SOURCE_ACCOUNT, amount, hex_currency, issuer, data, book_offers.ledger, false)
 
                 return new decimal(1).div(liquidity.last).toFixed()
+            },
+            currencyUTF8ToHex(code){
+                if(/^[a-zA-Z0-9\?\!\@\#\$\%\^\&\*\<\>\(\)\{\}\[\]\|\]\{\}]{3}$/.test(code))
+                    return code
+
+                if(/^[A-Z0-9]{40}$/.test(code))
+                    return code
+
+                let hex = ''
+
+                for(let i=0; i<code.length; i++){
+                    hex += code.charCodeAt(i).toString(16)
+                }
+
+                return hex
+                    .toUpperCase()
+                    .padEnd(40, '0')
             },
             async fetchBook(currency, issuer) {
                 if (ledger_errors > 10) {
