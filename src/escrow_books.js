@@ -136,16 +136,15 @@ module.exports = class escrow_books extends EventEmitter {
                             collateral: element.collateral,
                         }
                         if (liquidity_call < liquidity_base && FinishAfter > element.finish_after) {
-                            log('yup liquidate')
-                            // Escrow.finishEscrow(element.sequence, element.account, element.escrow_condition)   
+                            log('yup liquidate it')
                             this.emit('finishEscrow', rate_update)
                         }
                         if (PubSubManager != null) {
                             // dont send a message if no one is listening
-                            // if (PubSubManager.checkChannel(element.account)) {
+                            if (PubSubManager.checkChannel(element.account)) {
                                 log('pushed ', {RATE_UPDATE: rate_update})
                                 PubSubManager.route({RATE_UPDATE: rate_update}, element.account)
-                            // }
+                            }
                         }
                     }
                 }
