@@ -104,8 +104,8 @@ class service  {
 						}
 					})
 					ws.on('close', (message) => {
-						console.log('Stopping client connection....', message)
-						console.log('ws client id', ws?.client_id)
+						console.log(`Stopping client connection.... ${ws?.client_id}`, message)
+						Pubsub.removeBroker(ws?.client_id)
 					})
 					ws.on('error', (error) => {
 						log('SocketServer error')

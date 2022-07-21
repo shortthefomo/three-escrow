@@ -11,8 +11,7 @@ module.exports = class PubSubManager extends EventEmitter {
 
 		const self = this
 
-		let channels = {
-		}
+		let channels = {}
 
 		Object.assign(this, {
 			checkChannel(account) {
@@ -43,8 +42,8 @@ module.exports = class PubSubManager extends EventEmitter {
 					// console.log('error', 'trying to join channel: ' + channel)
 				}
 			},
-			removeBroker() {
-				//clearInterval(this.brokerId);
+			removeBroker(client_id) {
+				delete channels[client_id] 
 			},
 			publish(channel, message) {
 				try {
@@ -56,21 +55,6 @@ module.exports = class PubSubManager extends EventEmitter {
 					}
 				} catch (error) {
 					console.log(error)
-				}
-			},
-			active_channels() {
-				// when clients fall off remove them from the subscriber list
-				for (const channel in channels) {
-					if (channels.hasOwnProperty(channel)) {
-						const channelObj = channels[channel]
-						if (channelObj.subscribers.length > 0) {
-							channelObj.subscribers.forEach((subscriber, index) => {
-								if (subscriber._closeFrameSent == true) {
-									channels[channel].subscribers.splice(index, 1)
-								}
-							})
-						}
-					}
 				}
 			},
 			broker() {
@@ -99,7 +83,6 @@ module.exports = class PubSubManager extends EventEmitter {
 			setup() {
 				// Listen for our event and dispatch its process
 				this.addListener('broker', function() {
-					this.active_channels()
 					this.broker()
 				})
 			},
