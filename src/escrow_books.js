@@ -143,10 +143,10 @@ module.exports = class escrow_books extends EventEmitter {
                         }
                         if (PubSubManager != null) {
                             // dont send a message if no one is listening
-                            if (PubSubManager.checkChannel(element.account)) {
+                            // if (PubSubManager.checkChannel(element.account)) {
                                 log('pushed ', {RATE_UPDATE: rate_update})
                                 PubSubManager.route({RATE_UPDATE: rate_update}, element.account)
-                            }
+                            // }
                         }
                     }
                 }
