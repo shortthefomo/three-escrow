@@ -102,8 +102,8 @@ class service  {
 							log(error)
 						}
 					})
-					ws.on('close', () => {
-						// console.log('Stopping client connection.')
+					ws.on('close', (message) => {
+						console.log('Stopping client connection....', message)
 					})
 					ws.on('error', (error) => {
 						log('SocketServer error')
