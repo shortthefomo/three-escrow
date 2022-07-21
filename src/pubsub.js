@@ -99,7 +99,7 @@ module.exports = class PubSubManager extends EventEmitter {
 			setup() {
 				// Listen for our event and dispatch its process
 				this.addListener('broker', function() {
-					this.active_channels()
+					// this.active_channels()
 					this.broker()
 				})
 			},
