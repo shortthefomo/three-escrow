@@ -58,7 +58,7 @@ module.exports = class PubSubManager extends EventEmitter {
 					console.log(error)
 				}
 			},
-			dropped_channels() {
+			active_channels() {
 				// when clients fall off remove them from the subscriber list
 				for (const channel in channels) {
 					if (channels.hasOwnProperty(channel)) {
@@ -99,7 +99,7 @@ module.exports = class PubSubManager extends EventEmitter {
 			setup() {
 				// Listen for our event and dispatch its process
 				this.addListener('broker', function() {
-					this.dropped_channels()
+					this.active_channels()
 					this.broker()
 				})
 			},

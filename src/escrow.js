@@ -154,13 +154,10 @@ module.exports = class escrow extends EventEmitter {
                 let memwaa = null
                 let memo = null
                 try {
-                    log('raw', transaction.Memos[0].Memo.MemoData)
                     memwaa = Buffer.from(transaction.Memos[0].Memo.MemoData, 'hex').toString('utf8')
-                    console.log('memwaa', memwaa)
                     memo = JSON.parse(memwaa)
-                    log('memo', memo)
                 } catch (e) {
-                    log('error', e)
+                    // log('error', e)
                 }
                 if (memo == null) { return }
                 if (!('app' in memo)) { return}
