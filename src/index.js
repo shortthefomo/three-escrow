@@ -88,6 +88,7 @@ class service  {
 										Pubsub.route({'SUBSCRIBED': json.message.account}, json.message.account)
 
 										const res = Pubsub.channelPrivate(json.message.account)
+										ws.client_id = json.message.account
 										Pubsub.subscribe(ws, json.message.account)
 									}
 									break
@@ -104,6 +105,7 @@ class service  {
 					})
 					ws.on('close', (message) => {
 						console.log('Stopping client connection....', message)
+						console.log('ws client id', ws?.client_id)
 					})
 					ws.on('error', (error) => {
 						log('SocketServer error')
