@@ -96,8 +96,7 @@ module.exports = class escrow_books extends EventEmitter {
                         LEFT JOIN escrow_completed ON (escrow.escrow_condition = escrow_completed.escrow_condition)
                         WHERE ((escrow_completed.engine_result != 'tesSUCCESS' AND escrow_completed.engine_result != 'tecNO_TARGET') OR escrow_completed.engine_result IS NULL)
                         AND currency = '${currency}' 
-                        AND issuer = '${issuer}'
-                        AND finish_after >= '${FinishAfter}';`
+                        AND issuer = '${issuer}';`
 
                     const rows = await db.query(query)
                 
@@ -136,7 +135,7 @@ module.exports = class escrow_books extends EventEmitter {
                             cancel_after: element.cancel_after,
                             collateral: element.collateral,
                         }
-                        if (liquidity_call < liquidity_base) {
+                        if (liquidity_call < liquidity_base && FinishAfter > element.finish_after) {
                             log('yup liquidate')
                             // Escrow.finishEscrow(element.sequence, element.account, element.escrow_condition)   
                             this.emit('finishEscrow', rate_update)
