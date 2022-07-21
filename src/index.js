@@ -77,7 +77,9 @@ class service  {
 										log('PING', json.message.account)
 										if (!Pubsub.checkChannel(json.message.account)) {
 											const res = Pubsub.channelPrivate(json.message.account)
-											ws.client_id = json.message.account
+											if (ws?.client_id == null || ws?.client_id == undefined) {
+												ws.client_id = json.message.account
+											}
 											Pubsub.subscribe(ws, json.message.account)
 										}
 										Pubsub.route({'PONG': json.message.account}, json.message.account)
