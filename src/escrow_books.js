@@ -27,7 +27,7 @@ module.exports = class escrow_books extends EventEmitter {
                 this.emit('fetch_books')
             },
             async currentRate(amount, currency, issuer) {
-                const hex_currency = currencyUTF8ToHex(currency)
+                const hex_currency = this.currencyUTF8ToHex(currency)
                 const book_offers = await this.fetchBook(hex_currency, issuer)
                 if (book_offers.asks == undefined || book_offers.bids == undefined) { return }
                 const data = this.mutateData(book_offers, process.env.XRPL_SOURCE_ACCOUNT)
