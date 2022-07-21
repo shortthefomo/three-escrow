@@ -137,7 +137,7 @@ module.exports = class escrow_books extends EventEmitter {
                             this.emit('finishEscrow', rate_update)
                         }
                         if (PubSubManager != null) {
-                            log('pushed ', {rate_update: rate_update})
+                            log('pushed ', {RATE_UPDATE: rate_update})
                             PubSubManager.route({RATE_UPDATE: rate_update}, element.account)
                         }
                     }
