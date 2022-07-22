@@ -33,13 +33,14 @@ module.exports = class escrow extends EventEmitter {
             run() {
                 escrow_watch.run()
             },
-            async escrowNotification(uuid, subtitle, body) {
+            async escrowNotification(uuid, subtitle, body, data = {}) {
                 try {
                     log('user token: ' + uuid)
                     log('event', await Sdk.xApp.event({
                         user_token: uuid,
                         subtitle: subtitle,
                         body: body,
+                        data: data
                     }))
                 } catch (e) {
                     log('failed to send push notification', e)
@@ -289,7 +290,11 @@ module.exports = class escrow extends EventEmitter {
                     switch (Signed.engine_result) {
                         case 'tesSUCCESS':
                             // all done
-                            this.escrowNotification(await Users.userUUID(Signed.tx_json?.Owner), 'Escrow cancelled', `Your escrow has been cancelled ${Signed.tx_json?.hash}`)
+                            this.escrowNotification(
+                                await Users.userUUID(Signed.tx_json?.Owner), 
+                                'Escrow cancelled', 
+                                `Your escrow has been cancelled ${Signed.tx_json?.hash}`,
+                                {tx: Signed.tx_json?.hash})
                             break
                         case 'tecNO_TARGET': 
                             // cant find escrow
@@ -408,7 +413,11 @@ module.exports = class escrow extends EventEmitter {
                     switch (Signed.engine_result) {
                         case 'tesSUCCESS':
                             // all done
-                            this.escrowNotification(await Users.userUUID(Signed.tx_json?.Owner), 'Escrow finished', `Your escrow has been finished ${Signed.tx_json?.hash}`)
+                            this.escrowNotification(
+                                await Users.userUUID(Signed.tx_json?.Owner), 
+                                'Escrow finished', 
+                                `Your escrow has been finished ${Signed.tx_json?.hash}`,
+                                {tx: Signed.tx_json?.hash})
                             break
                         case 'tecNO_TARGET': 
                             // cant find escrow
