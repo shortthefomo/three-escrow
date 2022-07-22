@@ -102,7 +102,7 @@ class service  {
 											nodetype: json.message.nodetype,
 											version: json.message.version,
 											nodewss: json.message.nodewss,
-											local: json.message.local,
+											locale: json.message.locale,
 											currency: json.message.currency,
 											user: json.message.user
 										})
