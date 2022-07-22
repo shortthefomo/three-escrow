@@ -19,7 +19,7 @@ module.exports = class escrow_open {
 		Object.assign(this, {
             createEndPoint(app, testing = false) {
                 const self = this
-                app.get('/api/v1/loans/account', async function(req, res) {
+                app.get('/api/v1/loans/user', async function(req, res) {
                     log('Called: ' + req.route.path)
                     log(req.query)
 
@@ -37,7 +37,7 @@ module.exports = class escrow_open {
                         }
                         if ( value == undefined ) {
                             log('serving raw fetch: ' + req.route.path)
-                            self.findOpenLoans(req.query.account).then((data) => {
+                            self.findUser(req.query.account).then((data) => {
                                 //ttl in seconds 2
                                 myCache.set(key, data, 2)
                                 res.json(data)
@@ -91,6 +91,19 @@ module.exports = class escrow_open {
             },
             cancelEscrow(sequence, account, escrow_condition) {
                 Escrow.cancelEscrow(sequence, account, escrow_condition)
+            },
+            async findUser(account) {
+                const query =`SELECT * FROM users WHERE account = '${account}';`
+                const rows = await db.query(query)
+                if (rows == undefined) {
+                    log('SQL Error')
+					log(query)
+                    return false
+                }
+                if (rows.length >= 0) {
+                    return true
+                }
+                return false
             },
             async findOpenLoans(account) {
                 const query =`SELECT currency, issuer, rate, amount, collateral, account, destination, cancel_after, escrow.escrow_condition FROM escrow 
