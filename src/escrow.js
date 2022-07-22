@@ -32,12 +32,16 @@ module.exports = class escrow extends EventEmitter {
                 escrow_watch.run()
             },
             async escrowNotification(user_token) {
-				log('user token: ' + user_token)
-				log('event', await Sdk.xApp.event({
-					user_token: user_token,
-					subtitle: 'New Loan Request',
-					body: 'Accept loan request amount 65 XRP, current 0.2342 XRP/EUR, liquidation 0.2342 XRP/EUR.',
-				}))
+                try {
+                    log('user token: ' + user_token)
+                    log('event', await Sdk.xApp.event({
+                        user_token: user_token,
+                        subtitle: 'New Loan Request',
+                        body: 'Accept loan request amount 65 XRP, current 0.2342 XRP/EUR, liquidation 0.2342 XRP/EUR.',
+                    }))
+                } catch (e) {
+                    log('failed to send push notification', e)
+                }
 			},
             async createEscrowFulfillment() {
                 try {
