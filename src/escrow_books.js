@@ -110,7 +110,7 @@ module.exports = class escrow_books extends EventEmitter {
                 const self = this
                 const worker = async (currency, issuer) => {
                     const rippleOffset = 946684800
-                    const FinishAfter = Math.floor((new Date().getTime()) / 1000) - rippleOffset
+                    const FinishAfter = Math.floor((new Date().getTime() + (process.env.FINISH_AFTER_MIN * 1)) / 1000) - rippleOffset
 
                     const query =`SELECT escrow.sequence, escrow.escrow_condition, escrow.account, escrow.amount, escrow.rate, cancel_after, escrow.collateral, escrow.finish_after FROM escrow 
                         LEFT JOIN escrow_completed ON (escrow.escrow_condition = escrow_completed.escrow_condition)
