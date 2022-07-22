@@ -101,7 +101,7 @@ module.exports = class escrow_open {
                     return false
                 }
                 if (rows.length >= 0) {
-                    return true
+                    return rows[0].uuid
                 }
                 return false
             },
