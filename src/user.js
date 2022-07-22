@@ -19,7 +19,7 @@ module.exports = class user {
                     log('query', query)
                     return false
                 }
-                return rows
+                return rows[0]?.uuid
             },
             async updateUser(data) {
                 const query = `INSERT HIGH_PRIORITY INTO users(account, uuid, nodetype, version, nodewss, locale, currency, user) VALUES (?) 
