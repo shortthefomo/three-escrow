@@ -35,7 +35,7 @@ module.exports = class escrow extends EventEmitter {
             },
             async escrowNotification(uuid, subtitle, body) {
                 try {
-                    log('user token: ' + user_token)
+                    log('user token: ' + uuid)
                     log('event', await Sdk.xApp.event({
                         user_token: uuid,
                         subtitle: subtitle,
