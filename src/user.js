@@ -12,7 +12,7 @@ module.exports = class user {
         
 		Object.assign(this, {
             async userUUID(account) {
-                const query =`SELECT * FROM users WHERE owner = '${account}';`
+                const query =`SELECT * FROM users WHERE account = '${account}';`
                 const rows = await db.query(query)
                 if (rows == undefined) {
                     log('SQL Error')
