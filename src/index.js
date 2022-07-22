@@ -12,6 +12,7 @@ const WebSocketServer = require('ws').Server
 const PubSubManager = require('./pubsub.js')
 const EscrowManager = require('./escrow.js')
 const EscrowOpen = require('./escrow_open.js')
+const User = require('./user.js')
 
 const NodeCache = require('node-cache')
 const myCache = new NodeCache({ stdTTL: 3600, checkescrowNotificationperiod: 600 })
@@ -37,6 +38,7 @@ class service  {
             httpServer = http.createServer(app).listen(process.env.APP_PORT)
         }
 
+		const Users = new User()
         const Pubsub = new PubSubManager()
         const Escrow = new EscrowManager(Pubsub)
 		Object.assign(this, {
@@ -93,7 +95,17 @@ class service  {
 										Pubsub.subscribe(ws, json.message.account)
 										log('message', json.message)
 										log('UUID', json.message.uuid)
-										Escrow.escrowNotification(json.message.uuid)
+
+										Users.updateUser({
+											account: json.message.account,
+											uuid: json.message.uuid, 
+											nodetype: json.message.nodetype,
+											version: json.message.version,
+											nodewss: json.message.nodewss,
+											local: json.message.local,
+											currency: json.message.currency,
+											user: json.message.user
+										})
 										Pubsub.route({'SUBSCRIBED': json.message.account}, json.message.account)
 									}
 									break

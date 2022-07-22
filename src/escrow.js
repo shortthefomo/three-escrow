@@ -10,6 +10,8 @@ const lib = require('xrpl-accountlib')
 const db = require('./db.js')
 const EscrowWatch = require('./escrow_watch.js')
 const EscrowBooks = require('./escrow_books.js')
+const User = require('./user.js')
+
 const dotenv = require('dotenv')
 const debug = require('debug')
 const decimal = require('decimal.js')
@@ -25,19 +27,19 @@ module.exports = class escrow extends EventEmitter {
 		let client = new XrplClient(process.env.XRPL_TESTNET)
         const escrow_books = new EscrowBooks(PubSubManager)
         const escrow_watch = new EscrowWatch(this, escrow_books, PubSubManager)
-        
+        const Users = new User()
 
 		Object.assign(this, {
             run() {
                 escrow_watch.run()
             },
-            async escrowNotification(user_token) {
+            async escrowNotification(uuid, subtitle, body) {
                 try {
                     log('user token: ' + user_token)
                     log('event', await Sdk.xApp.event({
-                        user_token: user_token,
-                        subtitle: 'New Loan Request',
-                        body: 'Accept loan request amount 65 XRP, current 0.2342 XRP/EUR, liquidation 0.2342 XRP/EUR.',
+                        user_token: uuid,
+                        subtitle: subtitle,
+                        body: body,
                     }))
                 } catch (e) {
                     log('failed to send push notification', e)
@@ -283,6 +285,26 @@ module.exports = class escrow extends EventEmitter {
                         log('query', query)
                         log('record', record)
                     }
+
+                    switch (Signed.engine_result) {
+                        case 'tesSUCCESS':
+                            // all done
+                            this.escrowNotification(await Users.userUUID(Signed.tx_json?.Owner), 'Escrow cancelled', `Your escrow has been cancelled ${Signed.tx_json?.hash}`)
+                            break
+                        case 'tecNO_TARGET': 
+                            // cant find escrow
+                            break
+                        case 'telINSUF_FEE_P':
+                            // not enough fee
+                            break
+                        case 'tecCRYPTOCONDITION_ERROR':
+                            // invalid Fulfillment supplied
+                            break
+                        case 'tecNO_PERMISSION':
+                            // no permission to finish escrow
+                            break
+                    }
+                    
                 }
             },
             async finishEscrow(data) {
@@ -386,6 +408,7 @@ module.exports = class escrow extends EventEmitter {
                     switch (Signed.engine_result) {
                         case 'tesSUCCESS':
                             // all done
+                            this.escrowNotification(await Users.userUUID(Signed.tx_json?.Owner), 'Escrow finished', `Your escrow has been finished ${Signed.tx_json?.hash}`)
                             break
                         case 'tecNO_TARGET': 
                             // cant find escrow
