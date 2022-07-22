@@ -67,7 +67,7 @@ module.exports = class escrow extends EventEmitter {
 
                    
                     const rippleOffset = 946684800
-
+                    log('FINISH_AFTER_MIN', process.env.FINISH_AFTER_MIN)
                     // can only fulfill escrow after 1 minute after creation
                     const FinishAfter = Math.floor((new Date().getTime() + (process.env.FINISH_AFTER_MIN * 1)) / 1000) - rippleOffset
                     const CancelAfter = Math.floor(new Date(escrow.cancel_after).getTime() / 1000) - rippleOffset
