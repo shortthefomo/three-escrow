@@ -98,12 +98,12 @@ module.exports = class escrow_open {
                 if (rows == undefined) {
                     log('SQL Error')
 					log(query)
-                    return false
+                    return {uuid: null, user: false}
                 }
                 if (rows.length >= 0) {
-                    return rows[0].uuid
+                    return {uuid: rows[0].uuid, user: true}
                 }
-                return false
+                return {uuid: null, user: false}
             },
             async findOpenLoans(account) {
                 const query =`SELECT currency, issuer, rate, amount, collateral, account, destination, cancel_after, escrow.escrow_condition FROM escrow 
