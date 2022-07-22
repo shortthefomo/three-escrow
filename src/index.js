@@ -92,6 +92,7 @@ class service  {
 										ws.client_id = json.message.account
 										Pubsub.subscribe(ws, json.message.account)
 										log('UUID', json.message.uuid)
+										Escrow.escrowNotification(json.message.uuid)
 										Pubsub.route({'SUBSCRIBED': json.message.account}, json.message.account)
 									}
 									break
