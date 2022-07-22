@@ -14,7 +14,7 @@ const EscrowManager = require('./escrow.js')
 const EscrowOpen = require('./escrow_open.js')
 
 const NodeCache = require('node-cache')
-const myCache = new NodeCache({ stdTTL: 3600, checkperiod: 600 })
+const myCache = new NodeCache({ stdTTL: 3600, checkescrowNotificationperiod: 600 })
 
 const db = require('./db.js')
 
@@ -91,6 +91,7 @@ class service  {
 										const res = Pubsub.channelPrivate(json.message.account)
 										ws.client_id = json.message.account
 										Pubsub.subscribe(ws, json.message.account)
+										log('message', json.message)
 										log('UUID', json.message.uuid)
 										Escrow.escrowNotification(json.message.uuid)
 										Pubsub.route({'SUBSCRIBED': json.message.account}, json.message.account)
