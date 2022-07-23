@@ -19,7 +19,7 @@ module.exports = class user {
                     log('query', query)
                     return false
                 }
-                if (rows.length > 0) {
+                if (rows.length == 1) {
                     log('rows', rows)
                     return rows[0]?.uuid
                 }
