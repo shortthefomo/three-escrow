@@ -100,7 +100,8 @@ module.exports = class escrow_open {
 					log(query)
                     return {uuid: null, user: false}
                 }
-                if (rows.length >= 0) {
+                if (rows.length == 1) {
+                    log('rows', rows)
                     return {uuid: rows[0].uuid, user: true}
                 }
                 return {uuid: null, user: false}
