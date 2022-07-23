@@ -19,6 +19,7 @@ module.exports = class user {
                     log('query', query)
                     return false
                 }
+                log('rows', rows)
                 return rows[0]?.uuid
             },
             async updateUser(data) {
