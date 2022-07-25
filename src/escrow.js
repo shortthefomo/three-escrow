@@ -303,8 +303,12 @@ module.exports = class escrow extends EventEmitter {
                     switch (Signed.engine_result) {
                         case 'tesSUCCESS':
                             // all done
+                            const user_token = await Users.getUserToken(Signed.tx_json?.Owner)
+                            console.log(`send notification.... ${Signed.tx_json?.Owner}`)
+                            console.log(`user token ${user_token}`)
+
                             this.escrowPushNotification(
-                                await Users.getUserToken(Signed.tx_json?.Owner), 
+                                user_token, 
                                 'Escrow cancelled', 
                                 `Your escrow has been cancelled ${Signed.tx_json?.hash}`,
                                 {tx: Signed.tx_json?.hash})
@@ -427,8 +431,11 @@ module.exports = class escrow extends EventEmitter {
                     switch (Signed.engine_result) {
                         case 'tesSUCCESS':
                             // all done
+                            const user_token = await Users.getUserToken(Signed.tx_json?.Owner)
+                            console.log(`send notification.... ${Signed.tx_json?.Owner}`)
+                            console.log(`user token ${user_token}`)
                             this.escrowPushNotification(
-                                await Users.getUserToken(Signed.tx_json?.Owner), 
+                                user_token, 
                                 'Escrow finished', 
                                 `Your escrow has been finished ${Signed.tx_json?.hash}`,
                                 {tx: Signed.tx_json?.hash})
