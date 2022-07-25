@@ -278,6 +278,7 @@ module.exports = class escrow extends EventEmitter {
                     const keypair = lib.derive.familySeed(process.env.XRPL_SOURCE_ACCOUNT_SECRET)
                     log('Tx', {Tx})
                     const {signedTransaction} = lib.sign(Tx, keypair)
+                    log('cancelEscrow signedTransaction', {signedTransaction})
                     const Signed = await client.send({ command: 'submit', 'tx_blob': signedTransaction })
                     log('cancelEscrow', {Signed})
 
@@ -416,6 +417,7 @@ module.exports = class escrow extends EventEmitter {
 
                     const keypair = lib.derive.familySeed(process.env.XRPL_SOURCE_ACCOUNT_SECRET)
                     const {signedTransaction} = lib.sign(Tx, keypair)
+                    log('finishEscrow signedTransaction', {signedTransaction})
                     const Signed = await client.send({ command: 'submit', 'tx_blob': signedTransaction })
 
                     log('finishEscrow', {Signed})
