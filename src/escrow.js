@@ -84,6 +84,117 @@ module.exports = class escrow extends EventEmitter {
 				}
                 return false
             },
+            
+            ledgerEpoch() {
+                const rippleOffset = 946684800
+                const unix_time = Date.now() 
+                return Math.floor((unix_time) / 1000) - rippleOffset
+            },
+            async watchPayments() {
+                const self = this
+                client.on('ledger', async (event) => {
+					const request = {
+                        'id': 'xrpl-escrow-watcher',
+                        'command': 'ledger',
+                        'ledger_hash': event.ledger_hash,
+                        'ledger_index': "validated",
+                        'transactions': true,
+                        'expand': true,
+                        'owner_funds': true
+                    }
+                    const ledger_result = await client.send(request)
+                    log(`ledger close... ${ledger_result?.ledger?.ledger_index}`)
+
+                    const transactions = ledger_result?.ledger?.transactions
+                    for (let i = 0; i < transactions.length; i++) {
+                        const transaction = transactions[i]
+                        if (transaction.TransactionType == 'EscrowCreate' && transaction?.metaData?.TransactionResult == 'tesSUCCESS') {
+                            if (checkMemos(ledger, transaction)) {
+                                log('EscrowCreate', transaction)
+                                this.insertCreateEscrowData(ledger_result?.ledger?.ledger_index, transaction)
+                            }
+                        }
+                        if (transaction.TransactionType == 'EscrowCancel' && transaction?.metaData?.TransactionResult == 'tesSUCCESS') {
+                            if (checkMemos(ledger, transaction)) {
+                                log('EscrowCancel', transaction)
+                                this.insertCancelEscrowData(transaction)
+                            }
+                        }
+                        if (transaction.TransactionType == 'EscrowFinish' && transaction?.metaData?.TransactionResult == 'tesSUCCESS') {
+                            if (checkMemos(ledger, transaction)) {
+                                log('EscrowFinish', transaction)
+                                this.insertFinishEscrowData(transaction)
+                            }
+                        }
+                    }
+				})
+            },
+            checkMemos(transaction) {
+                if (transaction == undefined) { return false }
+                log(transaction.TransactionType, transaction)
+                if (!('Memos' in transaction)) { return false }
+                if (!('Memo' in transaction.Memos[0])) { return false }
+                if (!('MemoData' in transaction.Memos[0].Memo)) { return false }
+                let memwaa = null
+                let memo = null
+                try {
+                    memwaa = Buffer.from(transaction.Memos[0].Memo.MemoData, 'hex').toString('utf8')
+                    memo = JSON.parse(memwaa)
+                } catch (e) {
+                    // log('error', e)
+                }
+                if (memo == null) { return false }
+                if (!('app' in memo)) { return false }
+                if (memo.app != 'panic-bot_loans') { return false }
+
+                return true
+            },
+            async insertCancelEscrowData(transaction) {                
+                const query =`UPDATE escrow_completed engine_result = '${transaction.engine_result}', created = '${new Date().toISOString().slice(0, 19).replace('T', ' ')}' 
+                    WHERE hash = '${transaction.hash}';`
+                const rows = await db.query(query)
+                if (rows == undefined) {
+                    log('SQL Error')
+                    log('query', query)
+                }
+            },
+            async insertFinishEscrowData(transaction) {
+                const query =`UPDATE escrow_completed engine_result = '${transaction.engine_result}', created = '${new Date().toISOString().slice(0, 19).replace('T', ' ')}' 
+                    WHERE hash = '${transaction.hash}';`
+                const rows = await db.query(query)
+                if (rows == undefined) {
+                    log('SQL Error')
+                    log('query', query)
+                }   
+            },
+            async insertCreateEscrowData(ledger, transaction) {
+                const record = []
+                record[0] = transaction.Condition
+                record[1] = transaction.hash
+                record[2] = transaction.Account
+                record[3] = transaction.Destination
+                record[4] = memo.currency
+                record[5] = memo.amount
+                record[6] = memo.rate
+                record[7] = memo.collateral
+                record[8] = (transaction?.DestinationTag != undefined) ? transaction.DestinationTag : null
+                record[9] = (transaction?.SourceTag != undefined) ? transaction.SourceTag : null
+                record[10] = ledger
+                record[11] = memo.issuer
+                record[12] = new Date().toISOString().slice(0, 19).replace('T', ' ')
+                record[13] = (transaction?.CancelAfter != undefined) ? transaction.CancelAfter : null
+                record[14] = (transaction?.FinishAfter != undefined) ? transaction.FinishAfter : null
+                record[15] = (transaction?.Sequence != undefined) ? transaction.Sequence : 0
+                
+                let query =`INSERT HIGH_PRIORITY INTO escrow (escrow_condition, hash, account, destination, currency, amount, rate, collateral, destination_tag, source_tag, ledger, issuer, created, cancel_after, finish_after, sequence) VALUES (?);`
+                const rows = await db.query(query, [record])
+                if (rows == undefined) {
+                    log('SQL Error')
+                    log('query', query)
+                    log('record', record)
+                    log('transaction', transaction)
+                }
+            },
             async createEscrow(escrow) {
                 try {
                     const condition = await this.createEscrowFulfillment()
@@ -140,90 +251,6 @@ module.exports = class escrow extends EventEmitter {
                 } catch (error) {
 					log('error', error)
 				}
-            },
-            ledgerEpoch() {
-                const rippleOffset = 946684800
-                const unix_time = Date.now() 
-                return Math.floor((unix_time) / 1000) - rippleOffset
-            },
-            async watchPayments() {
-                const self = this
-                client.on('ledger', async (event) => {
-					const request = {
-                        'id': 'xrpl-escrow-watcher',
-                        'command': 'ledger',
-                        'ledger_hash': event.ledger_hash,
-                        'ledger_index': "validated",
-                        'transactions': true,
-                        'expand': true,
-                        'owner_funds': true
-                    }
-                    const ledger_result = await client.send(request)
-                    log(`ledger close... ${ledger_result?.ledger?.ledger_index}`)
-
-                    const transactions = ledger_result?.ledger?.transactions
-                    for (let i = 0; i < transactions.length; i++) {
-                        const transaction = transactions[i]
-                        if (transaction.TransactionType == 'EscrowCreate' && transaction?.metaData?.TransactionResult == 'tesSUCCESS') {
-                            //&& transaction.Account == process.env.PAYMENT_ADDRESS
-                            log('EscrowCreate', transaction)
-                            this.insertEscrowData(ledger_result?.ledger?.ledger_index, transaction)
-                        }
-                        if (transaction.TransactionType == 'EscrowCancel' && transaction?.metaData?.TransactionResult == 'tesSUCCESS') {
-                            log('EscrowCancel', transaction)
-                        }
-                        if (transaction.TransactionType == 'EscrowFinish' && transaction?.metaData?.TransactionResult == 'tesSUCCESS') {
-                            log('EscrowFinish', transaction)
-                        }
-                    }
-				})
-            },
-            async insertEscrowData(ledger, transaction) {
-                if (ledger == undefined || transaction == undefined) { return }
-                log('insertEscrowData', transaction)
-                log('ledger', ledger)
-                if (!('Memos' in transaction)) { return}
-                if (!('Memo' in transaction.Memos[0])) { return}
-                if (!('MemoData' in transaction.Memos[0].Memo)) { return}
-                let memwaa = null
-                let memo = null
-                try {
-                    memwaa = Buffer.from(transaction.Memos[0].Memo.MemoData, 'hex').toString('utf8')
-                    memo = JSON.parse(memwaa)
-                } catch (e) {
-                    // log('error', e)
-                }
-                if (memo == null) { return }
-                if (!('app' in memo)) { return}
-                if (memo.app != 'panic-bot_loans') { return}
-
-
-                const record = []
-                record[0] = transaction.Condition
-                record[1] = transaction.hash
-                record[2] = transaction.Account
-                record[3] = transaction.Destination
-                record[4] = memo.currency
-                record[5] = memo.amount
-                record[6] = memo.rate
-                record[7] = memo.collateral
-                record[8] = (transaction?.DestinationTag != undefined) ? transaction.DestinationTag : null
-                record[9] = (transaction?.SourceTag != undefined) ? transaction.SourceTag : null
-                record[10] = ledger
-                record[11] = memo.issuer
-                record[12] = new Date().toISOString().slice(0, 19).replace('T', ' ')
-                record[13] = (transaction?.CancelAfter != undefined) ? transaction.CancelAfter : null
-                record[14] = (transaction?.FinishAfter != undefined) ? transaction.FinishAfter : null
-                record[15] = (transaction?.Sequence != undefined) ? transaction.Sequence : 0
-                
-                let query =`INSERT HIGH_PRIORITY INTO escrow (escrow_condition, hash, account, destination, currency, amount, rate, collateral, destination_tag, source_tag, ledger, issuer, created, cancel_after, finish_after, sequence) VALUES (?);`
-                const rows = await db.query(query, [record])
-                if (rows == undefined) {
-                    log('SQL Error')
-                    log('query', query)
-                    log('record', record)
-                    log('transaction', transaction)
-                }
             },
             async cancelEscrow(offer_sequence, owner, condition) {
                 if (offer_sequence == null) { return 'noSequence'}
@@ -426,7 +453,7 @@ module.exports = class escrow extends EventEmitter {
                     const Signed = await client.send({ command: 'submit', 'tx_blob': signedTransaction })
 
                     log('finishEscrow', {Signed})
-                    
+
                     const record = []
                     record[0] = (Signed.tx_json?.hash != undefined) ? Signed.tx_json?.hash : null
                     record[1] = Signed.tx_json?.Condition
@@ -436,7 +463,6 @@ module.exports = class escrow extends EventEmitter {
                     record[5] = Signed.tx_json?.Fee
                     record[6] = data.sequence
                     record[7] = 'EscrowFinish'
-                    
                     
                     let query =`INSERT HIGH_PRIORITY INTO escrow_completed (hash, escrow_condition, engine_result, created, owner, fee, sequence, transaction_type) VALUES (?) ON DUPLICATE KEY UPDATE attempts = '${attempts}', fee = '${feeBase}', engine_result = '${Signed.engine_result}', created = '${new Date().toISOString().slice(0, 19).replace('T', ' ')}';`
                     const rows = await db.query(query, [record])
