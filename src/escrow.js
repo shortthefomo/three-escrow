@@ -169,6 +169,12 @@ module.exports = class escrow extends EventEmitter {
                             log('EscrowCreate', transaction)
                             this.insertEscrowData(ledger_result?.ledger?.ledger_index, transaction)
                         }
+                        if (transaction.TransactionType == 'EscrowCancel' && transaction?.metaData?.TransactionResult == 'tesSUCCESS') {
+                            log('EscrowCancel', transaction)
+                        }
+                        if (transaction.TransactionType == 'EscrowFinish' && transaction?.metaData?.TransactionResult == 'tesSUCCESS') {
+                            log('EscrowFinish', transaction)
+                        }
                     }
 				})
             },
@@ -190,7 +196,8 @@ module.exports = class escrow extends EventEmitter {
                 if (memo == null) { return }
                 if (!('app' in memo)) { return}
                 if (memo.app != 'panic-bot_loans') { return}
-                
+
+
                 const record = []
                 record[0] = transaction.Condition
                 record[1] = transaction.hash
