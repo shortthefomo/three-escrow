@@ -312,6 +312,19 @@ module.exports = class escrow extends EventEmitter {
                                 'Escrow cancelled', 
                                 `Your escrow has been cancelled ${Signed.tx_json?.hash}`,
                                 {tx: Signed.tx_json?.hash})
+
+                            if (PubSubManager != null) {
+                                // dont send a message if no one is listening
+                                if (PubSubManager.checkChannel(Signed.tx_json?.Owner)) {
+                                    const update = {
+                                        account: Signed.tx_json?.Owner, 
+                                        escrow_condition: Signed.tx_json?.Condition,
+                                        type: 'EscrowCancel',
+                                    }
+                                    log('EscrowCancel pushed', {ESCROW_CLEAR: update})
+                                    PubSubManager.route({ESCROW_CLEAR: update}, Signed.tx_json?.Owner)
+                                }
+                            }
                             break
                         case 'tecNO_TARGET': 
                             // cant find escrow
@@ -439,6 +452,19 @@ module.exports = class escrow extends EventEmitter {
                                 'Escrow finished', 
                                 `Your escrow has been finished ${Signed.tx_json?.hash}`,
                                 {tx: Signed.tx_json?.hash})
+                            
+                            if (PubSubManager != null) {
+                                // dont send a message if no one is listening
+                                if (PubSubManager.checkChannel(Signed.tx_json?.Owner)) {
+                                    const update = {
+                                        account: Signed.tx_json?.Owner, 
+                                        escrow_condition: Signed.tx_json?.Condition,
+                                        type: 'EscrowFinish',
+                                    }
+                                    log('EscrowFinish pushed', {ESCROW_CLEAR: update})
+                                    PubSubManager.route({ESCROW_CLEAR: update}, Signed.tx_json?.Owner)
+                                }
+                            }
                             break
                         case 'tecNO_TARGET': 
                             // cant find escrow
