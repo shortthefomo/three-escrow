@@ -36,7 +36,7 @@ module.exports = class escrow_watch extends EventEmitter {
                 const rippleOffset = 946684800
                 const CancelAfter = Math.floor(Date.now() / 1000) - rippleOffset
                 log('CancelAfter', CancelAfter)
-                const query =`SELECT escrow.sequence, escrow.escrow_condition, escrow.account FROM escrow 
+                const query =`SELECT escrow.sequence, escrow.escrow_condition, escrow.account, escrow.destination FROM escrow 
                     LEFT JOIN escrow_completed ON (escrow.escrow_condition = escrow_completed.escrow_condition)
                     WHERE escrow.cancel_after <= ${CancelAfter}
                     AND (escrow_completed.engine_result != 'tesSUCCESS' OR escrow_completed.engine_result IS NULL);`
@@ -50,7 +50,7 @@ module.exports = class escrow_watch extends EventEmitter {
                 log('findAndCancelExpiredEscrows', rows.length)
                 for (let index = 0; index < rows.length; index++) {
                     const element = rows[index]
-                    await Escrow.cancelEscrow(element.sequence, element.account, element.escrow_condition)
+                    await Escrow.cancelEscrow(element.sequence, element.destination, element.escrow_condition)
                 }
                 
                 this.startFindAndCancel()
