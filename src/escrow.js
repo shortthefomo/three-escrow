@@ -149,7 +149,8 @@ module.exports = class escrow extends EventEmitter {
 
                 return true
             },
-            async insertCancelEscrowData(transaction) {                
+            async insertCancelEscrowData(transaction) {
+                console.log('insertCancelEscrowData in')
                 let query =`UPDATE escrow_completed engine_result = '${transaction.engine_result}', created = '${new Date().toISOString().slice(0, 19).replace('T', ' ')}' 
                     WHERE hash = '${transaction.hash}';`
                 const rows = await db.query(query)
@@ -159,6 +160,7 @@ module.exports = class escrow extends EventEmitter {
                 }
 
                 const user_token = await Users.getUserToken(transaction.Owner)
+                console.log('user_token', user_token)
                 await this.escrowPushNotification(
                     user_token, 
                     'Escrow cancelled', 
@@ -168,6 +170,7 @@ module.exports = class escrow extends EventEmitter {
                 const escrow = await db.query(`SELECT escrow_conditions.escrow_condition, escrow_completed.hash FROM escrow_completed 
                 JOIN escrow_conditions ON (escrow_completed.escrow_condition = escrow_conditions.escrow_condition)
                 WHERE escrow_completed.hash = '${transaction.hash}';`)
+                console.log('escrow sql', escrow)
                 if (escrow == undefined) {
                     log('SQL Error')
                     log('query', escrow)
@@ -188,6 +191,7 @@ module.exports = class escrow extends EventEmitter {
                 }
             },
             async insertFinishEscrowData(transaction) {
+                console.log('insertFinishEscrowData in')
                 let query =`UPDATE escrow_completed engine_result = '${transaction.engine_result}', created = '${new Date().toISOString().slice(0, 19).replace('T', ' ')}' 
                     WHERE hash = '${transaction.hash}';`
                 const rows = await db.query(query)
@@ -196,7 +200,8 @@ module.exports = class escrow extends EventEmitter {
                     log('query', query)
                 }
 
-                const user_token = await Users.getUserToken(transaction.Owner)            
+                const user_token = await Users.getUserToken(transaction.Owner)
+                console.log('user_token', user_token)
                 await this.escrowPushNotification(
                     user_token, 
                     'Escrow finished', 
@@ -206,6 +211,7 @@ module.exports = class escrow extends EventEmitter {
                 const escrow = await db.query(`SELECT escrow_conditions.escrow_condition, escrow_completed.hash FROM escrow_completed 
                 JOIN escrow_conditions ON (escrow_completed.escrow_condition = escrow_conditions.escrow_condition)
                 WHERE escrow_completed.hash = '${transaction.hash}';`)
+                console.log('escrow sql', escrow)
                 if (escrow == undefined) {
                     log('SQL Error')
                     log('query', escrow)
