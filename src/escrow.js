@@ -308,8 +308,6 @@ module.exports = class escrow extends EventEmitter {
 
                             // these need to move to ledger close and node here.
                             const user_token = await Users.getUserToken(Signed.tx_json?.Owner)
-                            console.log(`send notification.... ${Signed.tx_json?.Owner}`)
-                            console.log(`user token ${user_token}`)
 
                             await this.escrowPushNotification(
                                 user_token, 
@@ -447,9 +445,7 @@ module.exports = class escrow extends EventEmitter {
 
 
                             // these need to move to ledger close and node here.
-                            const user_token = await Users.getUserToken(Signed.tx_json?.Owner)
-                            console.log(`send notification.... ${Signed.tx_json?.Owner}`)
-                            console.log(`user token ${user_token}`)
+                            const user_token = await Users.getUserToken(Signed.tx_json?.Owner))
                             await this.escrowPushNotification(
                                 user_token, 
                                 'Escrow finished', 
