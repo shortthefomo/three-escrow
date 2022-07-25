@@ -146,17 +146,18 @@ module.exports = class escrow extends EventEmitter {
                 }
 
                 const user_token = await Users.getUserToken(transaction.Owner)
-                console.log('user_token', user_token)
-                await this.escrowPushNotification(
-                    user_token, 
-                    'Escrow cancelled', 
-                    `Your escrow has been cancelled ${transaction.hash}`,
-                    {tx: transaction.hash})
+                if (user_token != false) {
+                    await this.escrowPushNotification(
+                        user_token, 
+                        'Escrow cancelled', 
+                        `Your escrow has been cancelled ${transaction.hash}`,
+                        {tx: transaction.hash})
+                }
 
                 const escrow = await db.query(`SELECT escrow_conditions.escrow_condition, escrow_completed.hash FROM escrow_completed 
                 JOIN escrow_conditions ON (escrow_completed.escrow_condition = escrow_conditions.escrow_condition)
                 WHERE escrow_completed.hash = '${transaction.hash}';`)
-                console.log('escrow sql', escrow)
+
                 if (escrow == undefined) {
                     log('SQL Error')
                     log('query', escrow)
@@ -199,17 +200,18 @@ module.exports = class escrow extends EventEmitter {
                 }
 
                 const user_token = await Users.getUserToken(transaction.Owner)
-                console.log('user_token', user_token)
-                await this.escrowPushNotification(
-                    user_token, 
-                    'Escrow finished', 
-                    `Your escrow has been finished ${transaction.hash}`,
-                    {tx: transaction.hash})
+                if (user_token != false) {
+                    await this.escrowPushNotification(
+                        user_token, 
+                        'Escrow finished', 
+                        `Your escrow has been finished ${transaction.hash}`,
+                        {tx: transaction.hash})
+                }
 
                 const escrow = await db.query(`SELECT escrow_conditions.escrow_condition, escrow_completed.hash FROM escrow_completed 
                 JOIN escrow_conditions ON (escrow_completed.escrow_condition = escrow_conditions.escrow_condition)
                 WHERE escrow_completed.hash = '${transaction.hash}';`)
-                console.log('escrow sql', escrow)
+
                 if (escrow == undefined) {
                     log('SQL Error')
                     log('query', escrow)
