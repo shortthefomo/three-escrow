@@ -109,19 +109,19 @@ module.exports = class escrow extends EventEmitter {
                     for (let i = 0; i < transactions.length; i++) {
                         const transaction = transactions[i]
                         if (transaction.TransactionType == 'EscrowCreate' && transaction?.metaData?.TransactionResult == 'tesSUCCESS') {
-                            if (checkMemos(ledger, transaction)) {
+                            if (this.checkMemos(transaction)) {
                                 log('EscrowCreate', transaction)
                                 this.insertCreateEscrowData(ledger_result?.ledger?.ledger_index, transaction)
                             }
                         }
                         if (transaction.TransactionType == 'EscrowCancel' && transaction?.metaData?.TransactionResult == 'tesSUCCESS') {
-                            if (checkMemos(ledger, transaction)) {
+                            if (this.checkMemos(transaction)) {
                                 log('EscrowCancel', transaction)
                                 this.insertCancelEscrowData(transaction)
                             }
                         }
                         if (transaction.TransactionType == 'EscrowFinish' && transaction?.metaData?.TransactionResult == 'tesSUCCESS') {
-                            if (checkMemos(ledger, transaction)) {
+                            if (this.checkMemos(transaction)) {
                                 log('EscrowFinish', transaction)
                                 this.insertFinishEscrowData(transaction)
                             }
