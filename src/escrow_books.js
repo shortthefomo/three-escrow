@@ -156,7 +156,7 @@ module.exports = class escrow_books extends EventEmitter {
                             collateral: element.collateral,
                         }
                         if (liquidity_call < liquidity_base && Now > element.finish_after) {
-                            log('yup liquidate it')
+                            log(`Yup liquidate it, now:${Now} finish_after: ${element.finish_after}`)
                             this.emit('finishEscrow', rate_update)
                         }
                         if (PubSubManager != null) {
