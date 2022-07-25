@@ -303,6 +303,9 @@ module.exports = class escrow extends EventEmitter {
                     switch (Signed.engine_result) {
                         case 'tesSUCCESS':
                             // all done
+
+
+                            // these need to move to ledger close and node here.
                             const user_token = await Users.getUserToken(Signed.tx_json?.Owner)
                             console.log(`send notification.... ${Signed.tx_json?.Owner}`)
                             console.log(`user token ${user_token}`)
@@ -352,16 +355,17 @@ module.exports = class escrow extends EventEmitter {
                 const rippleOffset = 946684800
                 const FinishAfter = Math.floor((new Date().getTime() + (process.env.FINISH_AFTER_MIN * 1)) / 1000) - rippleOffset
 
+                // make sure the escrow can be finished.
                 query = `SELECT escrow_conditions.fulfillment, escrow_conditions.escrow_condition FROM escrow_conditions 
                     JOIN escrow ON (escrow.escrow_condition = escrow_conditions.escrow_condition)
                     WHERE escrow.escrow_condition = '${data.escrow_condition}' AND finish_after >= '${FinishAfter}';`
                 
                 const escrow = await db.query(query)
-                log('finishEscrow lookup ', completed)
+                // log('finishEscrow lookup ', completed)
 
                 if (escrow == undefined || escrow.length == 0) {
-                    log('error', 'Escrow not found')
-                    log('query', query)
+                    // log('error', 'Escrow not found')
+                    // log('query', query)
                     return 'escrowNotFound'
                 }
 
@@ -438,6 +442,9 @@ module.exports = class escrow extends EventEmitter {
                     switch (Signed.engine_result) {
                         case 'tesSUCCESS':
                             // all done
+
+
+                            // these need to move to ledger close and node here.
                             const user_token = await Users.getUserToken(Signed.tx_json?.Owner)
                             console.log(`send notification.... ${Signed.tx_json?.Owner}`)
                             console.log(`user token ${user_token}`)
