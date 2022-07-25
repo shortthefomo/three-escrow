@@ -33,10 +33,23 @@ module.exports = class escrow extends EventEmitter {
             run() {
                 escrow_watch.run()
             },
-            async escrowNotification(uuid, subtitle, body, data = {}) {
+            async escrowEventNotification(uuid, subtitle, body, data = {}) {
                 try {
                     log('user token: ' + uuid)
                     log('event', await Sdk.xApp.event({
+                        user_token: uuid,
+                        subtitle: subtitle,
+                        body: body,
+                        data: data
+                    }))
+                } catch (e) {
+                    log('failed to send event notification', e)
+                }
+			},
+            async escrowPushNotification(uuid, subtitle, body, data = {}) {
+                try {
+                    log('user token: ' + uuid)
+                    log('event', await Sdk.xApp.push({
                         user_token: uuid,
                         subtitle: subtitle,
                         body: body,
@@ -290,7 +303,7 @@ module.exports = class escrow extends EventEmitter {
                     switch (Signed.engine_result) {
                         case 'tesSUCCESS':
                             // all done
-                            this.escrowNotification(
+                            this.escrowPushNotification(
                                 await Users.userUUID(Signed.tx_json?.Owner), 
                                 'Escrow cancelled', 
                                 `Your escrow has been cancelled ${Signed.tx_json?.hash}`,
