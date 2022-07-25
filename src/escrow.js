@@ -168,6 +168,23 @@ module.exports = class escrow extends EventEmitter {
                 }   
             },
             async insertCreateEscrowData(ledger, transaction) {
+                if (transaction == undefined) { return false }
+                log(transaction.TransactionType, transaction)
+                if (!('Memos' in transaction)) { return false }
+                if (!('Memo' in transaction.Memos[0])) { return false }
+                if (!('MemoData' in transaction.Memos[0].Memo)) { return false }
+                let memwaa = null
+                let memo = null
+                try {
+                    memwaa = Buffer.from(transaction.Memos[0].Memo.MemoData, 'hex').toString('utf8')
+                    memo = JSON.parse(memwaa)
+                } catch (e) {
+                    // log('error', e)
+                }
+                if (memo == null) { return false }
+                if (!('app' in memo)) { return false }
+                if (memo.app != 'panic-bot_loans') { return false }
+
                 const record = []
                 record[0] = transaction.Condition
                 record[1] = transaction.hash
