@@ -304,7 +304,7 @@ module.exports = class escrow extends EventEmitter {
                         case 'tesSUCCESS':
                             // all done
                             this.escrowPushNotification(
-                                await Users.userUUID(Signed.tx_json?.Owner), 
+                                await Users.getUserToken(Signed.tx_json?.Owner), 
                                 'Escrow cancelled', 
                                 `Your escrow has been cancelled ${Signed.tx_json?.hash}`,
                                 {tx: Signed.tx_json?.hash})
@@ -427,7 +427,7 @@ module.exports = class escrow extends EventEmitter {
                         case 'tesSUCCESS':
                             // all done
                             this.escrowPushNotification(
-                                await Users.userUUID(Signed.tx_json?.Owner), 
+                                await Users.getUserToken(Signed.tx_json?.Owner), 
                                 'Escrow finished', 
                                 `Your escrow has been finished ${Signed.tx_json?.hash}`,
                                 {tx: Signed.tx_json?.hash})

@@ -11,7 +11,7 @@ module.exports = class user {
         dotenv.config()
         
 		Object.assign(this, {
-            async userUUID(account) {
+            async getUserToken(account) {
                 const query =`SELECT * FROM users WHERE account = '${account}';`
                 const rows = await db.query(query)
                 if (rows == undefined) {
