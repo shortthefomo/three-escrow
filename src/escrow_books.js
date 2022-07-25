@@ -116,8 +116,7 @@ module.exports = class escrow_books extends EventEmitter {
                         LEFT JOIN escrow_completed ON (escrow.escrow_condition = escrow_completed.escrow_condition)
                         WHERE ((escrow_completed.engine_result != 'tesSUCCESS' AND escrow_completed.engine_result != 'tecNO_TARGET') OR escrow_completed.engine_result IS NULL)
                         AND currency = '${currency}' 
-                        AND issuer = '${issuer}'
-                        AND escrow.finish_after < ${FinishAfter};`
+                        AND issuer = '${issuer}';`
 
                     const rows = await db.query(query)
                 
