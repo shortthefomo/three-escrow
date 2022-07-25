@@ -50,7 +50,7 @@ module.exports = class escrow_watch extends EventEmitter {
                 log('findAndCancelExpiredEscrows', rows.length)
                 for (let index = 0; index < rows.length; index++) {
                     const element = rows[index]
-                    Escrow.cancelEscrow(element.sequence, element.account, element.escrow_condition)
+                    await Escrow.cancelEscrow(element.sequence, element.account, element.escrow_condition)
                 }
                 
                 this.startFindAndCancel()

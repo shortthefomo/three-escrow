@@ -322,8 +322,9 @@ module.exports = class escrow extends EventEmitter {
                             // no permission to finish escrow
                             break
                     }
-                    
+                    return Signed.engine_result
                 }
+                return false
             },
             async finishEscrow(data) {
                 let feeBase = 350
