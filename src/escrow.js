@@ -378,12 +378,6 @@ module.exports = class escrow extends EventEmitter {
                         return 'tecNO_TARGET'
                     }
 
-                    // no permission to finish escrow
-                    if (completed[0]?.engine_result == 'tecNO_PERMISSION') {
-                        log('error', 'Escrow cant be finish no permission')
-                        return 'tecNO_PERMISSION'
-                    }
-
                     // up the fee if it failed
                     if (completed[0]?.engine_result == 'telINSUF_FEE_P') {
                         feeBase += (10 * attempts)
@@ -466,17 +460,17 @@ module.exports = class escrow extends EventEmitter {
                                 }
                             }
                             break
+                        case 'tecNO_PERMISSION':
+                            // not allowed... queue for later
+                            break;
                         case 'tecNO_TARGET': 
-                            // cant find escrow
+                            // cant find escrow its completed
                             break
                         case 'telINSUF_FEE_P':
                             // not enough fee
                             break
                         case 'tecCRYPTOCONDITION_ERROR':
                             // invalid Fulfillment supplied
-                            break
-                        case 'tecNO_PERMISSION':
-                            // no permission to finish escrow
                             break
                     }
                     return Signed.engine_result

@@ -39,7 +39,7 @@ module.exports = class escrow_watch extends EventEmitter {
                 const query =`SELECT escrow.sequence, escrow.escrow_condition, escrow.account, escrow.destination FROM escrow 
                     LEFT JOIN escrow_completed ON (escrow.escrow_condition = escrow_completed.escrow_condition)
                     WHERE escrow.cancel_after <= ${CancelAfter}
-                    AND ((escrow_completed.engine_result != 'tesSUCCESS' AND escrow_completed.engine_result != 'tecNO_PERMISSION') OR escrow_completed.engine_result IS NULL);`
+                    AND ((escrow_completed.engine_result != 'tesSUCCESS' AND escrow_completed.engine_result != 'tecNO_TARGET') OR escrow_completed.engine_result IS NULL);`
                 const rows = await db.query(query)
 
                 
