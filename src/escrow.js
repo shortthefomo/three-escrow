@@ -307,7 +307,7 @@ module.exports = class escrow extends EventEmitter {
                             console.log(`send notification.... ${Signed.tx_json?.Owner}`)
                             console.log(`user token ${user_token}`)
 
-                            this.escrowPushNotification(
+                            await this.escrowPushNotification(
                                 user_token, 
                                 'Escrow cancelled', 
                                 `Your escrow has been cancelled ${Signed.tx_json?.hash}`,
@@ -434,7 +434,7 @@ module.exports = class escrow extends EventEmitter {
                             const user_token = await Users.getUserToken(Signed.tx_json?.Owner)
                             console.log(`send notification.... ${Signed.tx_json?.Owner}`)
                             console.log(`user token ${user_token}`)
-                            this.escrowPushNotification(
+                            await this.escrowPushNotification(
                                 user_token, 
                                 'Escrow finished', 
                                 `Your escrow has been finished ${Signed.tx_json?.hash}`,
