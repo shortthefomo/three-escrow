@@ -137,7 +137,7 @@ module.exports = class escrow extends EventEmitter {
                 if (memo != 'Cancelled collateral via three.') { return false }
                 log(transaction.TransactionType, transaction)
 
-                let query =`UPDATE escrow_completed engine_result = '${transaction.metaData.TransactionResult}', created = '${new Date().toISOString().slice(0, 19).replace('T', ' ')}' 
+                let query =`UPDATE escrow_completed SET engine_result = '${transaction.metaData.TransactionResult}', created = '${new Date().toISOString().slice(0, 19).replace('T', ' ')}' 
                     WHERE hash = '${transaction.hash}';`
                 const rows = await db.query(query)
                 if (rows == undefined) {
@@ -190,7 +190,7 @@ module.exports = class escrow extends EventEmitter {
                 if (memo != 'Finish escrow via three.') { return false }
                 log(transaction.TransactionType, transaction)
 
-                let query =`UPDATE escrow_completed engine_result = '${transaction.metaData.TransactionResult}', created = '${new Date().toISOString().slice(0, 19).replace('T', ' ')}' 
+                let query =`UPDATE escrow_completed SET engine_result = '${transaction.metaData.TransactionResult}', created = '${new Date().toISOString().slice(0, 19).replace('T', ' ')}' 
                     WHERE hash = '${transaction.hash}';`
                 const rows = await db.query(query)
                 if (rows == undefined) {
