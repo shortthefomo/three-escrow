@@ -172,13 +172,13 @@ module.exports = class escrow extends EventEmitter {
                     log('SQL Error')
                     log('query', escrow)
                 }
-                if (rows.length == 1) {
+                if (escrow.length == 1) {
                     if (PubSubManager != null) {
                         // dont send a message if no one is listening
                         if (PubSubManager.checkChannel(transaction.Owner)) {
                             const update = {
                                 account: transaction.Owner, 
-                                escrow_condition: condition,
+                                escrow_condition: escrow[0]?.escrow_condition,
                                 type: 'EscrowCancel',
                             }
                             log('EscrowCancel pushed', {ESCROW_CLEAR: update})
@@ -210,7 +210,7 @@ module.exports = class escrow extends EventEmitter {
                     log('SQL Error')
                     log('query', escrow)
                 }
-                if (rows.length == 1) {
+                if (escrow.length == 1) {
                     if (PubSubManager != null) {
                         // dont send a message if no one is listening
                         if (PubSubManager.checkChannel(transaction.Owner)) {
