@@ -426,7 +426,7 @@ module.exports = class escrow extends EventEmitter {
                     switch (Signed.engine_result) {
                         case 'tesSUCCESS':
                             // all done
-                            this.escrowNotification(
+                            this.escrowPushNotification(
                                 await Users.userUUID(Signed.tx_json?.Owner), 
                                 'Escrow finished', 
                                 `Your escrow has been finished ${Signed.tx_json?.hash}`,
