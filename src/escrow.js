@@ -150,22 +150,80 @@ module.exports = class escrow extends EventEmitter {
                 return true
             },
             async insertCancelEscrowData(transaction) {                
-                const query =`UPDATE escrow_completed engine_result = '${transaction.engine_result}', created = '${new Date().toISOString().slice(0, 19).replace('T', ' ')}' 
+                let query =`UPDATE escrow_completed engine_result = '${transaction.engine_result}', created = '${new Date().toISOString().slice(0, 19).replace('T', ' ')}' 
                     WHERE hash = '${transaction.hash}';`
                 const rows = await db.query(query)
                 if (rows == undefined) {
                     log('SQL Error')
                     log('query', query)
                 }
+
+                const user_token = await Users.getUserToken(transaction.Owner)
+                await this.escrowPushNotification(
+                    user_token, 
+                    'Escrow cancelled', 
+                    `Your escrow has been cancelled ${transaction.hash}`,
+                    {tx: transaction.hash})
+
+                const escrow = await db.query(`SELECT escrow_conditions.escrow_condition, escrow_completed.hash FROM escrow_completed 
+                JOIN escrow_conditions ON (escrow_completed.escrow_condition = escrow_conditions.escrow_condition)
+                WHERE escrow_completed.hash = '${transaction.hash}';`)
+                if (escrow == undefined) {
+                    log('SQL Error')
+                    log('query', escrow)
+                }
+                if (rows.length == 1) {
+                    if (PubSubManager != null) {
+                        // dont send a message if no one is listening
+                        if (PubSubManager.checkChannel(transaction.Owner)) {
+                            const update = {
+                                account: transaction.Owner, 
+                                escrow_condition: condition,
+                                type: 'EscrowCancel',
+                            }
+                            log('EscrowCancel pushed', {ESCROW_CLEAR: update})
+                            PubSubManager.route({ESCROW_CLEAR: update}, transaction.Owner)
+                        }
+                    }
+                }
             },
             async insertFinishEscrowData(transaction) {
-                const query =`UPDATE escrow_completed engine_result = '${transaction.engine_result}', created = '${new Date().toISOString().slice(0, 19).replace('T', ' ')}' 
+                let query =`UPDATE escrow_completed engine_result = '${transaction.engine_result}', created = '${new Date().toISOString().slice(0, 19).replace('T', ' ')}' 
                     WHERE hash = '${transaction.hash}';`
                 const rows = await db.query(query)
                 if (rows == undefined) {
                     log('SQL Error')
                     log('query', query)
-                }   
+                }
+
+                const user_token = await Users.getUserToken(transaction.Owner)            
+                await this.escrowPushNotification(
+                    user_token, 
+                    'Escrow finished', 
+                    `Your escrow has been finished ${transaction.hash}`,
+                    {tx: transaction.hash})
+
+                const escrow = await db.query(`SELECT escrow_conditions.escrow_condition, escrow_completed.hash FROM escrow_completed 
+                JOIN escrow_conditions ON (escrow_completed.escrow_condition = escrow_conditions.escrow_condition)
+                WHERE escrow_completed.hash = '${transaction.hash}';`)
+                if (escrow == undefined) {
+                    log('SQL Error')
+                    log('query', escrow)
+                }
+                if (rows.length == 1) {
+                    if (PubSubManager != null) {
+                        // dont send a message if no one is listening
+                        if (PubSubManager.checkChannel(transaction.Owner)) {
+                            const update = {
+                                account: transaction.Owner, 
+                                escrow_condition: escrow[0]?.escrow_condition,
+                                type: 'EscrowFinish',
+                            }
+                            log('EscrowFinish pushed', {ESCROW_CLEAR: update})
+                            PubSubManager.route({ESCROW_CLEAR: update}, transaction.Owner)
+                        }
+                    }
+                }
             },
             async insertCreateEscrowData(ledger, transaction) {
                 if (transaction == undefined) { return false }
@@ -355,29 +413,6 @@ module.exports = class escrow extends EventEmitter {
                     switch (Signed.engine_result) {
                         case 'tesSUCCESS':
                             // all done
-
-
-                            // these need to move to ledger close and node here.
-                            const user_token = await Users.getUserToken(Signed.tx_json?.Owner)
-
-                            await this.escrowPushNotification(
-                                user_token, 
-                                'Escrow cancelled', 
-                                `Your escrow has been cancelled ${Signed.tx_json?.hash}`,
-                                {tx: Signed.tx_json?.hash})
-
-                            if (PubSubManager != null) {
-                                // dont send a message if no one is listening
-                                if (PubSubManager.checkChannel(Signed.tx_json?.Owner)) {
-                                    const update = {
-                                        account: Signed.tx_json?.Owner, 
-                                        escrow_condition: condition,
-                                        type: 'EscrowCancel',
-                                    }
-                                    log('EscrowCancel pushed', {ESCROW_CLEAR: update})
-                                    PubSubManager.route({ESCROW_CLEAR: update}, Signed.tx_json?.Owner)
-                                }
-                            }
                             break
                         case 'tecNO_TARGET': 
                             // cant find escrow
@@ -492,29 +527,6 @@ module.exports = class escrow extends EventEmitter {
                     switch (Signed.engine_result) {
                         case 'tesSUCCESS':
                             // all done
-
-
-                            // these need to move to ledger close and node here.
-                            const user_token = await Users.getUserToken(Signed.tx_json?.Owner)
-                            
-                            await this.escrowPushNotification(
-                                user_token, 
-                                'Escrow finished', 
-                                `Your escrow has been finished ${Signed.tx_json?.hash}`,
-                                {tx: Signed.tx_json?.hash})
-                            
-                            if (PubSubManager != null) {
-                                // dont send a message if no one is listening
-                                if (PubSubManager.checkChannel(Signed.tx_json?.Owner)) {
-                                    const update = {
-                                        account: Signed.tx_json?.Owner, 
-                                        escrow_condition: Signed.tx_json?.Condition,
-                                        type: 'EscrowFinish',
-                                    }
-                                    log('EscrowFinish pushed', {ESCROW_CLEAR: update})
-                                    PubSubManager.route({ESCROW_CLEAR: update}, Signed.tx_json?.Owner)
-                                }
-                            }
                             break
                         case 'tecNO_PERMISSION':
                             // not allowed... queue for later
