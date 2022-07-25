@@ -109,48 +109,34 @@ module.exports = class escrow extends EventEmitter {
                     for (let i = 0; i < transactions.length; i++) {
                         const transaction = transactions[i]
                         if (transaction.TransactionType == 'EscrowCreate' && transaction?.metaData?.TransactionResult == 'tesSUCCESS') {
-                            if (this.checkMemos(transaction)) {
-                                log('EscrowCreate', transaction)
-                                this.insertCreateEscrowData(ledger_result?.ledger?.ledger_index, transaction)
-                            }
+                            log('EscrowCreate', transaction)
+                            this.insertCreateEscrowData(ledger_result?.ledger?.ledger_index, transaction)
                         }
                         if (transaction.TransactionType == 'EscrowCancel' && transaction?.metaData?.TransactionResult == 'tesSUCCESS') {
-                            if (this.checkMemos(transaction)) {
-                                log('EscrowCancel', transaction)
-                                this.insertCancelEscrowData(transaction)
-                            }
+                            log('EscrowCancel', transaction)
+                            this.insertCancelEscrowData(transaction)
                         }
                         if (transaction.TransactionType == 'EscrowFinish' && transaction?.metaData?.TransactionResult == 'tesSUCCESS') {
-                            if (this.checkMemos(transaction)) {
-                                log('EscrowFinish', transaction)
-                                this.insertFinishEscrowData(transaction)
-                            }
+                            log('EscrowFinish', transaction)
+                            this.insertFinishEscrowData(transaction)
                         }
                     }
 				})
             },
-            checkMemos(transaction) {
+            async insertCancelEscrowData(transaction) {
                 if (transaction == undefined) { return false }
-                log(transaction.TransactionType, transaction)
                 if (!('Memos' in transaction)) { return false }
                 if (!('Memo' in transaction.Memos[0])) { return false }
                 if (!('MemoData' in transaction.Memos[0].Memo)) { return false }
-                let memwaa = null
                 let memo = null
                 try {
-                    memwaa = Buffer.from(transaction.Memos[0].Memo.MemoData, 'hex').toString('utf8')
-                    memo = JSON.parse(memwaa)
+                    memo = Buffer.from(transaction.Memos[0].Memo.MemoData, 'hex').toString('utf8')
                 } catch (e) {
                     // log('error', e)
                 }
-                if (memo == null) { return false }
-                if (!('app' in memo)) { return false }
-                if (memo.app != 'panic-bot_loans') { return false }
+                if (memo != 'Cancelled collateral via three.') { return false }
+                log(transaction.TransactionType, transaction)
 
-                return true
-            },
-            async insertCancelEscrowData(transaction) {
-                console.log('insertCancelEscrowData in')
                 let query =`UPDATE escrow_completed engine_result = '${transaction.engine_result}', created = '${new Date().toISOString().slice(0, 19).replace('T', ' ')}' 
                     WHERE hash = '${transaction.hash}';`
                 const rows = await db.query(query)
@@ -191,7 +177,19 @@ module.exports = class escrow extends EventEmitter {
                 }
             },
             async insertFinishEscrowData(transaction) {
-                console.log('insertFinishEscrowData in')
+                if (transaction == undefined) { return false }
+                if (!('Memos' in transaction)) { return false }
+                if (!('Memo' in transaction.Memos[0])) { return false }
+                if (!('MemoData' in transaction.Memos[0].Memo)) { return false }
+                let memo = null
+                try {
+                    memo = Buffer.from(transaction.Memos[0].Memo.MemoData, 'hex').toString('utf8')
+                } catch (e) {
+                    // log('error', e)
+                }
+                if (memo != 'Finish escrow via three.') { return false }
+                log(transaction.TransactionType, transaction)
+
                 let query =`UPDATE escrow_completed engine_result = '${transaction.engine_result}', created = '${new Date().toISOString().slice(0, 19).replace('T', ' ')}' 
                     WHERE hash = '${transaction.hash}';`
                 const rows = await db.query(query)
@@ -375,7 +373,7 @@ module.exports = class escrow extends EventEmitter {
                     
                     const memos = [{
                         Memo: {
-                            MemoData: Buffer.from('Cancelled collateral via three', 'utf-8').toString('hex').toUpperCase(),
+                            MemoData: Buffer.from('Cancelled collateral via three.', 'utf-8').toString('hex').toUpperCase(),
                         }
                     }]
 
@@ -487,7 +485,7 @@ module.exports = class escrow extends EventEmitter {
                 if (account_data != null && 'Sequence' in account_data) {
                     const memos = [{
                         Memo: {
-                            MemoData: Buffer.from(`Finish escrow via three, order books slip to ${data.current_rate} exceeding liquidation rate ${data.original_rate} on ledger ${data.ledger}`, 'utf-8').toString('hex').toUpperCase(),
+                            MemoData: Buffer.from(`Finish escrow via three.`, 'utf-8').toString('hex').toUpperCase(),
                         }
                     }]
 
