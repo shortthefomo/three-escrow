@@ -318,7 +318,7 @@ module.exports = class escrow extends EventEmitter {
                                 if (PubSubManager.checkChannel(Signed.tx_json?.Owner)) {
                                     const update = {
                                         account: Signed.tx_json?.Owner, 
-                                        escrow_condition: Signed.tx_json?.Condition,
+                                        escrow_condition: condition,
                                         type: 'EscrowCancel',
                                     }
                                     log('EscrowCancel pushed', {ESCROW_CLEAR: update})
