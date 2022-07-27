@@ -131,7 +131,7 @@ module.exports = class escrow_books extends EventEmitter {
                         const element = rows[index]
                         const data = this.mutateData(book_offers, element.account)
                         // const asks_liquidity = self.liquidityCheckAsks(element.account, element.amount, currency, issuer, data, book_offers.ledger)
-                        const bids_liquidity = self.liquidityCheckBids(element.account, element.amount, currency, issuer, data, book_offers.ledger)
+                        const bids_liquidity = self.liquidityCheckBids(element.account, element.amount, currency, issuer, data, book_offers.ledger, false)
                         // log(`liquidityCheckAsks`, asks_liquidity)
                         // log(`liquidityCheckBids`, bids_liquidity)
                         
