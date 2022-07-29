@@ -36,7 +36,7 @@ module.exports = class rest {
                         }
 
                         log('serving raw fetch: ' + req.route.path)
-                        self.subscribeNotifications(req.query.account).then((data) => {
+                        self.subscribeNotifications(req.query.account, req.query.notifications).then((data) => {
                             res.json(data)
                         })
                     }
