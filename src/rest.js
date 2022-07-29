@@ -34,15 +34,11 @@ module.exports = class rest {
                             log('serving cached: ' + req.route.path)
                             res.json(value)
                         }
-                        if ( value == undefined ) {
-                            log('serving raw fetch: ' + req.route.path)
-                            self.subscribeNotifications(req.query.account).then((data) => {
-                                //ttl in seconds 2
-                                myCache.set(key, data, 2)
-                                res.json(data)
-                            })
-                        }
-                        log('response sent: ' + req.route.path)
+
+                        log('serving raw fetch: ' + req.route.path)
+                        self.subscribeNotifications(req.query.account).then((data) => {
+                            res.json(data)
+                        })
                     }
                 })
 
