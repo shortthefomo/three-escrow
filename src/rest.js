@@ -7,7 +7,7 @@ const dotenv = require('dotenv')
 const debug = require('debug')
 const log = debug('escrow:open')
 
-module.exports = class escrow_open {
+module.exports = class rest {
 	constructor(nodeCache, Escrow) {
         
         dotenv.config()
@@ -19,6 +19,33 @@ module.exports = class escrow_open {
 		Object.assign(this, {
             createEndPoint(app, testing = false) {
                 const self = this
+                app.get('/api/v1/loans/subscribe', async function(req, res) {
+                    log('Called: ' + req.route.path)
+                    log(req.query)
+
+                    if (testing) {
+                        res.header("Access-Control-Allow-Origin", "*")
+                        if (!('account' in req.query)) { return res.json({ 'error' : 'missing parameter account'}) }
+                        if (!('notifications' in req.query)) { return res.json({ 'error' : 'missing parameter notifications'}) }
+
+                        const key = req.route.path  + '/' + Object.keys(req.query).map(function(e){return req.query[e]}).join("/")
+                        const value = myCache.get(key)
+                        if ( value != undefined ) {
+                            log('serving cached: ' + req.route.path)
+                            res.json(value)
+                        }
+                        if ( value == undefined ) {
+                            log('serving raw fetch: ' + req.route.path)
+                            self.subscribeNotifications(req.query.account).then((data) => {
+                                //ttl in seconds 2
+                                myCache.set(key, data, 2)
+                                res.json(data)
+                            })
+                        }
+                        log('response sent: ' + req.route.path)
+                    }
+                })
+
                 app.get('/api/v1/loans/user', async function(req, res) {
                     log('Called: ' + req.route.path)
                     log(req.query)
@@ -105,6 +132,20 @@ module.exports = class escrow_open {
                     return {uuid: rows[0].uuid, user: true}
                 }
                 return {uuid: null, user: false}
+            },
+            async subscribeNotifications(account, user_token, notifications) {
+                const record = []
+                record[0] = user_token
+                record[1] = notifications
+                record[2] = account
+
+                let query =`INSERT INTO notifications_lenders (user_token, notifications, account) VALUES (?) ON DUPLICATE UPDATE notifications = '${notifications}';`
+                const rows = await db.query(query, [record])
+                if (rows == undefined) {
+                    log('SQL Error')
+                    log('query', query)
+                    log('record', record)
+                }
             },
             async findOpenLoans(account) {
                 const query =`SELECT currency, issuer, rate, amount, collateral, account, destination, cancel_after, escrow.escrow_condition FROM escrow 

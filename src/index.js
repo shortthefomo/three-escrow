@@ -11,7 +11,7 @@ const fs = require( 'fs')
 const WebSocketServer = require('ws').Server
 const PubSubManager = require('./pubsub.js')
 const EscrowManager = require('./escrow.js')
-const EscrowOpen = require('./escrow_open.js')
+const Rest = require('./rest.js')
 const User = require('./user.js')
 
 const NodeCache = require('node-cache')
@@ -51,8 +51,8 @@ class service  {
 				this.createEndPoints()
 			},
 			createEndPoints() {
-				const open = new EscrowOpen(myCache, Escrow)
-				open.createEndPoint(app, true)
+				const rest = new Rest(myCache, Escrow)
+				rest.createEndPoint(app, true)
 			},
             startSocketServer() {
 
