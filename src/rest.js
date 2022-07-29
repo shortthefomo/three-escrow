@@ -133,7 +133,7 @@ module.exports = class rest {
             async subscribeNotifications(account, user_token, notifications) {
                 const record = []
                 record[0] = user_token
-                record[1] = notifications
+                record[1] = (notifications == 'true') ? 1 : 0
                 record[2] = account
 
                 let query =`INSERT INTO notifications_lenders (user_token, notifications, account) VALUES (?) ON DUPLICATE KEY UPDATE notifications = '${notifications}';`
