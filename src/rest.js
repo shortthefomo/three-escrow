@@ -136,7 +136,7 @@ module.exports = class rest {
                 record[1] = notifications
                 record[2] = account
 
-                let query =`INSERT INTO notifications_lenders (user_token, notifications, account) VALUES (?) ON DUPLICATE UPDATE notifications = '${notifications}';`
+                let query =`INSERT INTO notifications_lenders (user_token, notifications, account) VALUES (?) ON DUPLICATE KEY UPDATE notifications = '${notifications}';`
                 const rows = await db.query(query, [record])
                 if (rows == undefined) {
                     log('SQL Error')
