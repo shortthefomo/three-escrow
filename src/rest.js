@@ -27,6 +27,7 @@ module.exports = class rest {
                         res.header("Access-Control-Allow-Origin", "*")
                         if (!('account' in req.query)) { return res.json({ 'error' : 'missing parameter account'}) }
                         if (!('notifications' in req.query)) { return res.json({ 'error' : 'missing parameter notifications'}) }
+                        if (!('user_token' in req.query)) { return res.json({ 'error' : 'missing parameter user_token'}) }
 
                         const key = req.route.path  + '/' + Object.keys(req.query).map(function(e){return req.query[e]}).join("/")
                         const value = myCache.get(key)
@@ -36,7 +37,7 @@ module.exports = class rest {
                         }
 
                         log('serving raw fetch: ' + req.route.path)
-                        self.subscribeNotifications(req.query.account, req.query.notifications).then((data) => {
+                        self.subscribeNotifications(req.query.account, req.query.user_token, req.query.notifications).then((data) => {
                             res.json(data)
                         })
                     }
