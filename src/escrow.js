@@ -49,7 +49,7 @@ module.exports = class escrow extends EventEmitter {
             async escrowPushNotification(uuid, subtitle, body, data = {}) {
                 try {
                     log('user token: ' + uuid)
-                    log('event', await Sdk.xApp.push({
+                    log('push', await Sdk.xApp.push({
                         user_token: uuid,
                         subtitle: subtitle,
                         body: body,
@@ -147,7 +147,7 @@ module.exports = class escrow extends EventEmitter {
 
                 const user_token = await Users.getUserToken(transaction.Owner)
                 if (user_token != false) {
-                    await this.escrowPushNotification(
+                    await this.escrowEventNotification(
                         user_token, 
                         'Escrow cancelled', 
                         `Your escrow has been cancelled ${transaction.hash}`,
