@@ -201,7 +201,7 @@ module.exports = class escrow extends EventEmitter {
 
                 const user_token = await Users.getUserToken(transaction.Owner)
                 if (user_token != false) {
-                    await this.escrowPushNotification(
+                    await this.escrowEventNotification(
                         user_token, 
                         'Escrow finished', 
                         `Your escrow has been finished ${transaction.hash}`,
