@@ -97,6 +97,7 @@ class service  {
 										log('UUID', json.message.uuid)
 
 										Users.updateUser({
+											app: json.message.app,
 											account: json.message.account,
 											uuid: json.message.uuid, 
 											nodetype: json.message.nodetype,
