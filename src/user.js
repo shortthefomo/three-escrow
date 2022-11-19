@@ -26,8 +26,8 @@ module.exports = class user {
                 return false
             },
             async updateUser(data) {
-                const query = `INSERT HIGH_PRIORITY INTO users(account, uuid, nodetype, version, nodewss, locale, currency, user) VALUES (?) 
-                    ON DUPLICATE KEY UPDATE uuid = '${data.uuid}', nodetype='${data.nodetype}', version='${data.version}', nodewss='${data.nodewss}', locale='${data.locale}' , currency='${data.currency}' , user='${data.user}';`
+                const query = `INSERT HIGH_PRIORITY INTO users(account, uuid, nodetype, version, nodewss, locale, currency, user, app, appkey) VALUES (?) 
+                    ON DUPLICATE KEY UPDATE uuid = '${data.uuid}', nodetype='${data.nodetype}', version='${data.version}', nodewss='${data.nodewss}', locale='${data.locale}' , currency='${data.currency}' , user='${data.user}' , app='${data.app}' , appkey='${data.appkey}';`
                     
                 const record = []
                 record[0] = data.account
@@ -38,6 +38,8 @@ module.exports = class user {
                 record[5] = data.locale
                 record[6] = data.currency
                 record[7] = data.user
+                record[8] = data.app
+                record[9] = data.appkey
 
                 const rows = await db.query(query, [record])
                 if (rows == undefined) {

@@ -98,6 +98,7 @@ class service  {
 
 										Users.updateUser({
 											app: json.message.app,
+											appkey: json.message.appkey,
 											account: json.message.account,
 											uuid: json.message.uuid, 
 											nodetype: json.message.nodetype,
