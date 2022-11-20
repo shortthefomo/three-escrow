@@ -97,7 +97,7 @@ class service  {
 										log('UUID', json.message.uuid)
 
 										// guard.. our apps
-										if (json.message.appkey!= 'fa0382d0-ed38-458b-b0a1-2972567187de' || json.message.appkey != '0778a512-8f99-4555-94e9-989c28d87279') {
+										if (json.message.appkey != 'fa0382d0-ed38-458b-b0a1-2972567187de' && json.message.appkey != '0778a512-8f99-4555-94e9-989c28d87279') {
 											console.log('error unwanted access', json.message.appkey)
 											return
 										}
