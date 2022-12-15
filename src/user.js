@@ -3,7 +3,7 @@
 const db = require('./db.js')
 const dotenv = require('dotenv')
 const debug = require('debug')
-const log = debug('main:user')
+const log = debug('escrow:user')
 
 module.exports = class user {
 	constructor(PubSubManager) {
@@ -26,7 +26,6 @@ module.exports = class user {
                 return false
             },
             async updateUser(data) {
-                console.log('updateUser', data)
                 const query_account =`SELECT * FROM users WHERE account = '${data.account}';`
                 const rows_account = await db.query(query_account)
                 let opened = 1
@@ -34,9 +33,9 @@ module.exports = class user {
                     opened = rows_account[0]?.opened
                 }
 
+                console.log('updateUser', data)
                 const query = `INSERT HIGH_PRIORITY INTO users(account, uuid, nodetype, version, nodewss, locale, currency, user, app, appkey, lastaccess, opened) VALUES (?) 
                     ON DUPLICATE KEY UPDATE uuid = '${data.uuid}', nodetype='${data.nodetype}', version='${data.version}', nodewss='${data.nodewss}', locale='${data.locale}' , currency='${data.currency}' , user='${data.user}' , app='${data.app}' , appkey='${data.appkey}' , lastaccess='${new Date().toISOString().slice(0, 19).replace('T', ' ')}', opened='${opened+1}';`
-                console.log('query', query)
 
                 const record = []
                 record[0] = data.account
@@ -52,8 +51,6 @@ module.exports = class user {
                 record[10] = new Date().toISOString().slice(0, 19).replace('T', ' ')
                 record[11] = opened
 
-                console.log('record', record)
-                console.log('opened', opened)
                 const rows = await db.query(query, [record])
                 if (rows == undefined) {
                     log('SQL Error')
