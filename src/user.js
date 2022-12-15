@@ -52,6 +52,8 @@ module.exports = class user {
                 record[10] = new Date().toISOString().slice(0, 19).replace('T', ' ')
                 record[11] = opened
 
+                console.log('record', record)
+                console.log('opened', opened)
                 const rows = await db.query(query, [record])
                 if (rows == undefined) {
                     log('SQL Error')
