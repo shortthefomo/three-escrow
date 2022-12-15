@@ -27,8 +27,15 @@ module.exports = class user {
             },
             async updateUser(data) {
                 console.log('updateUser', data)
-                const query = `INSERT HIGH_PRIORITY INTO users(account, uuid, nodetype, version, nodewss, locale, currency, user, app, appkey, lastaccess) VALUES (?) 
-                    ON DUPLICATE KEY UPDATE uuid = '${data.uuid}', nodetype='${data.nodetype}', version='${data.version}', nodewss='${data.nodewss}', locale='${data.locale}' , currency='${data.currency}' , user='${data.user}' , app='${data.app}' , appkey='${data.appkey}' , lastaccess='${new Date().toISOString().slice(0, 19).replace('T', ' ')}';`
+                const query_account =`SELECT * FROM users WHERE account = '${data.account}';`
+                const rows_account = await db.query(query_account)
+                let opened = 1
+                if (rows_account != undefined && rows_account.length == 1) {
+                    opened = rows_account[0]?.opened
+                }
+
+                const query = `INSERT HIGH_PRIORITY INTO users(account, uuid, nodetype, version, nodewss, locale, currency, user, app, appkey, lastaccess, opened) VALUES (?) 
+                    ON DUPLICATE KEY UPDATE uuid = '${data.uuid}', nodetype='${data.nodetype}', version='${data.version}', nodewss='${data.nodewss}', locale='${data.locale}' , currency='${data.currency}' , user='${data.user}' , app='${data.app}' , appkey='${data.appkey}' , lastaccess='${new Date().toISOString().slice(0, 19).replace('T', ' ')}', opened='${opened+1}';`
                     
                 const record = []
                 record[0] = data.account
