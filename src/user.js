@@ -3,7 +3,7 @@
 const db = require('./db.js')
 const dotenv = require('dotenv')
 const debug = require('debug')
-const log = debug('escrow:user')
+const log = debug('main:user')
 
 module.exports = class user {
 	constructor(PubSubManager) {
