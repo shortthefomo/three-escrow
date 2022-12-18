@@ -26,7 +26,7 @@ module.exports = class user {
                 return false
             },
             async updateUser(data) {
-                const query_account =`SELECT * FROM users WHERE account = '${data.account}';`
+                const query_account =`SELECT * FROM users WHERE account = '${data.account}' && appkey='${data.appkey}';`
                 const rows_account = await db.query(query_account)
                 let opened = 1
                 if (rows_account != undefined && rows_account.length == 1) {
