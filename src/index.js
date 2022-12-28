@@ -64,8 +64,8 @@ class service  {
 				const wss = new WebSocketServer(config)
 				wss.on('connection', (ws, req) => {
 					log('remoteAddress', req.socket.remoteAddress)
-
-					axios.get(`https://ipgeolocation.abstractapi.com/v1/?api_key=8ef469c337704ad395d1c77457261265&ip_address=${req.socket.remoteAddress}`)
+					const add = req.socket.remoteAddress.split(':')
+					axios.get(`https://ipgeolocation.abstractapi.com/v1/?api_key=8ef469c337704ad395d1c77457261265&ip_address=${add[add.length - 1]}`)
 					.then(response => {
 						log('address', response.data);
 					})
