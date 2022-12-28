@@ -13,6 +13,7 @@ const PubSubManager = require('./pubsub.js')
 const EscrowManager = require('./escrow.js')
 const Rest = require('./rest.js')
 const User = require('./user.js')
+const axios = require('axios')
 
 const NodeCache = require('node-cache')
 const myCache = new NodeCache({ stdTTL: 3600, checkescrowNotificationperiod: 600 })
@@ -63,6 +64,15 @@ class service  {
 				const wss = new WebSocketServer(config)
 				wss.on('connection', (ws, req) => {
 					log('remoteAddress', req.socket.remoteAddress)
+
+					axios.get(`https://ipgeolocation.abstractapi.com/v1/?api_key=8ef469c337704ad395d1c77457261265&ip_address=${req.socket.remoteAddress}`)
+					.then(response => {
+						log('address', response.data);
+					})
+					.catch(error => {
+						log(error);
+					})
+					
 					ws.on('message', async (data) => {
 						try {
 							if (Pubsub == null) { return }

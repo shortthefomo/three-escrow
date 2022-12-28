@@ -12,6 +12,7 @@
   "dependencies": {
     "EventEmitter": "^1.0.0",
     "app": "^0.1.0",
+    "axios": "^1.2.1",
     "crypto": "^1.0.1",
     "debug": "^4.3.3",
     "decimal.js": "^10.3.1",
