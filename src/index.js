@@ -62,6 +62,7 @@ class service  {
 				}
 				const wss = new WebSocketServer(config)
 				wss.on('connection', (ws, req) => {
+					console.log('remoteAddress', req.socket.remoteAddress)
 					ws.on('message', async (data) => {
 						try {
 							if (Pubsub == null) { return }
