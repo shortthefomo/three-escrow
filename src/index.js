@@ -63,16 +63,17 @@ class service  {
 				}
 				const wss = new WebSocketServer(config)
 				wss.on('connection', (ws, req) => {
-					log('remoteAddress', req.headers['x-forwarded-for'].split(/\s*,\s*/)[0])
+					log('headers', req.headers)
+					log('x-forwarded-for', req.headers['x-forwarded-for'].split(/\s*,\s*/)[0])
 					// const add = req.socket.remoteAddress.split(':')
 					// log('ip', add[add.length - 1])
-					axios.get(`https://ipgeolocation.abstractapi.com/v1/?api_key=8ef469c337704ad395d1c77457261265&ip_address=${add[add.length - 1]}`)
-					.then(response => {
-						log('address', response.data);
-					})
-					.catch(error => {
-						log(error);
-					})
+					// axios.get(`https://ipgeolocation.abstractapi.com/v1/?api_key=8ef469c337704ad395d1c77457261265&ip_address=${add[add.length - 1]}`)
+					// .then(response => {
+					// 	log('address', response.data);
+					// })
+					// .catch(error => {
+					// 	log(error);
+					// })
 					
 					ws.on('message', async (data) => {
 						try {
